@@ -1,0 +1,22 @@
+import { NestFactory } from '@nestjs/core';
+import { Logger } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  const logger = new Logger('Bootstrap');
+
+  app.setGlobalPrefix('api');
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    credentials: true,
+  });
+
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+  logger.log(`First Choice NestJS Backend running on port ${port} with prefix /api`);
+}
+bootstrap();

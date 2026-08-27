@@ -71,19 +71,19 @@
   02. Color Variable
 ==================================================================*/
 :root {
-  --accent-color: #2E7D32;
-  --primary-color: #4CAF50;
-  --secondary-color: #0D1B3E;
+  --accent-color: #136DF4;
+  --primary-color: #1F2937;
+  --secondary-color: #4B5563;
   --secondary2-color: #8694A7;
   --white-color: #ffffff;
   --black-color: #000000;
-  --gray-color: #F0FDF4;
-  --gray2-color: #F4FBF7;
-  --gray3-color: #D1FAE5;
-  --gray4-color: #F3FBF7;
-  --gray5-color: #DCFCE7;
+  --gray-color: #FFF6EB;
+  --gray2-color: #F4F2F9;
+  --gray3-color: #D2E3FF;
+  --gray4-color: #F3F6FF;
+  --gray5-color: #DBD5F7;
   --gray6-color: #F4F6F8;
-  --gray7-color: #D1FAE5;
+  --gray7-color: #D3E4FF;
   --danger-color: #EF4444;
   --danger-darker-color: #DC2626;
   --warning-color: #F59E0B;

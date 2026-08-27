@@ -173,9 +173,6 @@
     var $preloader = $(".cs_preloader");
     if (!$preloader.length) return;
     $preloader.addClass("cs_loaded");
-    setTimeout(function () {
-      $preloader.remove();
-    }, 600);
   }
   /*=============================================================
     02. Mobile Menu

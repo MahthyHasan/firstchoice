@@ -1,10 +1,13 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Preloader from './components/common/Preloader';
 import useMainJs from './hooks/useMainJs';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
+// Public pages
 import Home from './pages/Home';
 import HomeV2 from './pages/HomeV2';
 import HomeV3 from './pages/HomeV3';
@@ -33,21 +36,42 @@ import Testimonials from './pages/Testimonials';
 import Faq from './pages/Faq';
 import PatientResource from './pages/PatientResource';
 import Career from './pages/Career';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Password from './pages/Password';
 import Location from './pages/Location';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermCondition from './pages/TermCondition';
 import Error404 from './pages/Error404';
 
+// Auth Pages
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import EmailVerificationPage from './pages/auth/EmailVerificationPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+
+// Dashboard Pages
+import PatientDashboard from './pages/dashboard/PatientDashboard';
+import AdminDashboard from './pages/dashboard/AdminDashboard';
+
 function AppContent() {
   useMainJs();
+  const location = useLocation();
+
+  // Hide header & footer on auth pages and dashboard screens
+  const isDashboardOrAuth =
+    location.pathname.startsWith('/dashboard') ||
+    location.pathname === '/login' ||
+    location.pathname === '/register' ||
+    location.pathname === '/verify-email' ||
+    location.pathname === '/forgot-password' ||
+    location.pathname === '/reset-password';
+
   return (
     <>
       <Preloader />
-      <Header />
+      {!isDashboardOrAuth && <Header />}
+
       <Routes>
+        {/* Public Website Routes */}
         <Route path="/" element={<HomeV2 />} />
         <Route path="/home-v2" element={<HomeV2 />} />
         <Route path="/home-v3" element={<HomeV3 />} />
@@ -76,24 +100,50 @@ function AppContent() {
         <Route path="/faq" element={<Faq />} />
         <Route path="/patient-resource" element={<PatientResource />} />
         <Route path="/career" element={<Career />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/password" element={<Password />} />
         <Route path="/location" element={<Location />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/term-condition" element={<TermCondition />} />
+
+        {/* Auth Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/verify-email" element={<EmailVerificationPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* Protected Dashboard Routes */}
+        <Route
+          path="/dashboard/patient/*"
+          element={
+            <ProtectedRoute role="patient">
+              <PatientDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/admin/*"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Error404 />} />
       </Routes>
-      <Footer />
+
+      {!isDashboardOrAuth && <Footer />}
     </>
   );
 }
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

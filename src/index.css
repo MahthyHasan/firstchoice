@@ -1,0 +1,151 @@
+/* Index CSS for Hospil React theme */
+
+/* Page Header SVG Banner Styling & Animations */
+.cs_page_header_svg_banner {
+  position: relative;
+  background: linear-gradient(135deg, #0D1B3E 0%, #17355B 50%, #2E7D32 100%);
+  padding: 215px 0 135px;
+  overflow: hidden;
+  color: #ffffff;
+  z-index: 1;
+}
+
+@media (max-width: 991px) {
+  .cs_page_header_svg_banner {
+    padding: 170px 0 95px;
+  }
+}
+
+@media (max-width: 575px) {
+  .cs_page_header_svg_banner {
+    padding: 145px 0 70px;
+  }
+}
+
+/* Ambient Orbs */
+.cs_header_orb_1 {
+  position: absolute;
+  top: -20%;
+  right: 5%;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 194, 203, 0.25) 0%, rgba(0, 194, 203, 0) 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  animation: csOrbFloat 8s ease-in-out infinite alternate;
+}
+
+.cs_header_orb_2 {
+  position: absolute;
+  bottom: -30%;
+  left: 10%;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(23, 84, 109, 0.4) 0%, rgba(23, 84, 109, 0) 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  animation: csOrbFloat 10s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes csOrbFloat {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(-30px) scale(1.1);
+  }
+}
+
+/* Floating SVG Shapes */
+.cs_header_floating_shape {
+  position: absolute;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.cs_header_shape_1 {
+  top: 20%;
+  right: 10%;
+  width: 130px;
+  animation: csShapeFloat 6s ease-in-out infinite;
+}
+
+.cs_header_shape_2 {
+  bottom: 25%;
+  right: 25%;
+  width: 90px;
+  animation: csShapeFloat 8s ease-in-out 1s infinite reverse;
+}
+
+.cs_header_shape_3 {
+  top: 30%;
+  left: 4%;
+  width: 80px;
+  animation: csShapeFloat 7s ease-in-out 0.5s infinite;
+}
+
+@keyframes csShapeFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(6deg);
+  }
+}
+
+/* Animated ECG Pulse Wave SVG */
+.cs_header_ecg_line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.cs_ecg_path {
+  stroke: #00c2cb;
+  stroke-width: 2.5;
+  fill: none;
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: csPulseDash 4s linear infinite;
+}
+
+@keyframes csPulseDash {
+  0% {
+    stroke-dashoffset: 1200;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Breadcrumb Typography inside SVG Banner */
+.cs_page_header_svg_banner .cs_page_header_title {
+  color: #ffffff;
+  position: relative;
+}
+
+.cs_page_header_svg_banner .breadcrumb .breadcrumb-item a {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.cs_page_header_svg_banner .breadcrumb .breadcrumb-item a:hover {
+  color: #00c2cb;
+}
+
+.cs_page_header_svg_banner .breadcrumb .breadcrumb-item.active {
+  color: #00c2cb;
+  font-weight: 500;
+}
+
+.cs_page_header_svg_banner .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  color: rgba(255, 255, 255, 0.4);
+  content: "/";
+}

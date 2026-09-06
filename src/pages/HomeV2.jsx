@@ -264,7 +264,7 @@ const HomeV2 = () => {
         {/* End Ticker Strip */}
 
         {/* Start Services List Section */}
-        <section className="cs_service_section_2 position-relative z-1">
+        <section className="cs_service_section_2 position-relative z-1 py-5 my-4">
           <div className="container">
             <div className="cs_section_heading_style_1 cs_type_1 cs_center_column cs_mb_48 text-center">
               <p className="cs_section_subtitle cs_gray3_bg cs_accent_color cs_fs_14 cs_mb_12 cs_radius_5">
@@ -308,7 +308,7 @@ const HomeV2 = () => {
         {/* End Services List Section */}
 
         {/* Start Special Feature Highlight: Postnatal Confinement Home Care */}
-        <section className="cs_postnatal_highlight py-5 cs_gray4_bg">
+        <section className="cs_postnatal_highlight py-5 my-5 cs_gray4_bg cs_radius_20">
           <div className="container">
             <div className="row align-items-center cs_gap_y_30">
               <div className="col-lg-6">
@@ -340,7 +340,7 @@ const HomeV2 = () => {
         {/* End Special Feature Highlight */}
 
         {/* Start Why Choose Us Section */}
-        <section className="cs_whychoose_section_2 cs_gray2_bg cs_radius_20 py-5">
+        <section className="cs_whychoose_section_2 cs_gray2_bg cs_radius_20 py-5 my-5">
           <div className="container">
             <div className="cs_section_heading_style_1 cs_type_1 cs_center_column cs_mb_48 text-center">
               <p className="cs_section_subtitle cs_gray3_bg cs_accent_color cs_fs_14 cs_mb_12 cs_radius_5 text-uppercase">

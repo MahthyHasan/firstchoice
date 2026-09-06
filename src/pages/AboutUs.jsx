@@ -333,122 +333,7 @@ const AboutUs = () => {
         </div>
       </section>
       {/* End Feature Section */}
-      {/* Start Team Section */}
-      <section className="cs_team_section_1 cs_gray2_bg">
-        <div className="container">
-          <div className="cs_section_heading_style_1 cs_center_column cs_mb_48 cs_mb_lg_40 text-center">
-            <p className="cs_section_subtitle cs_accent_color cs_fs_14 cs_mb_17 text-uppercase">//  Meet Our Specialists</p>
-            <h2 className="cs_section_title cs_fs_40 cs_bold mb-0">Experienced, Empathetic, and <br  /> Dedicated to Your Recovery</h2>
-          </div>
-          <div className="row cs_gap_y_24">
-            <div className="col-lg-3 col-sm-6">
-              <div className="cs_team_Style_1">
-                <div className="cs_team_img cs_radius_20 cs_mb_24 position-relative">
-                  <img  src="/assets/img/team_img_1.webp" alt="Doctor image" />
-                  <span className="cs_team_designation cs_gray3_bg cs_fs_14 position-absolute">Cardiology</span>
-                  <div className="cs_team_contact">
-                    <div className="cs_team_social">
-                      <a href="#"><i className="fa-brands fa-facebook-f"></i></a>
-                      <a href="#"><i className="fa-brands fa-linkedin-in"></i></a>
-                      <a href="#"><i className="fa-brands fa-x-twitter"></i></a>
-                      <a href="#"><i className="fa-brands fa-instagram"></i></a>
-                    </div>
-                    <Link  to="/appointment" aria-label="Book an appointment" className="cs_btn_style_1 cs_white_color cs_semibold cs_radius_5">
-                    <img  src="/assets/img/icons/calendar.svg" alt="Calendar icon" />
-                    <span>Appointment</span>
-                    </Link>
-                  </div>
-                </div>
-                <div className="cs_team_info">
-                  <h3 className="cs_team_title cs_fs_20 cs_bold cs_mb_12">
-                    <Link  to="/doctor-details" aria-label="View doctor details">Dr. Gregory Bynum <span>(MD, FRCP)</span></Link>
-                  </h3>
-                  <p className="cs_team_subtitle  mb-0">Senior Interventional Cardiologist</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-sm-6">
-              <div className="cs_team_Style_1">
-                <div className="cs_team_img cs_radius_20 cs_mb_24 position-relative">
-                  <img  src="/assets/img/team_img_2.webp" alt="Doctor image" />
-                  <span className="cs_team_designation cs_gray3_bg cs_fs_14 position-absolute">Neurology</span>
-                  <div className="cs_team_contact">
-                    <div className="cs_team_social">
-                      <a href="#"><i className="fa-brands fa-facebook-f"></i></a>
-                      <a href="#"><i className="fa-brands fa-linkedin-in"></i></a>
-                      <a href="#"><i className="fa-brands fa-x-twitter"></i></a>
-                      <a href="#"><i className="fa-brands fa-instagram"></i></a>
-                    </div>
-                    <Link  to="/appointment" aria-label="Book an appointment" className="cs_btn_style_1 cs_white_color cs_semibold cs_radius_5">
-                    <img  src="/assets/img/icons/calendar.svg" alt="Calendar icon" />
-                    <span>Appointment</span>
-                    </Link>
-                  </div>
-                </div>
-                <div className="cs_team_info">
-                  <h3 className="cs_team_title cs_fs_20 cs_bold cs_mb_12">
-                    <Link  to="/doctor-details" aria-label="View doctor details">Dr. Lori Fletcher <span>(MBBS, MS)</span></Link>
-                  </h3>
-                  <p className="cs_team_subtitle  mb-0">Chief Neurosurgeon Specialist</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-sm-6">
-              <div className="cs_team_Style_1">
-                <div className="cs_team_img cs_radius_20 cs_mb_24 position-relative">
-                  <img  src="/assets/img/team_img_3.webp" alt="Doctor image" />
-                  <span className="cs_team_designation cs_gray3_bg cs_fs_14 position-absolute">Orthopedics</span>
-                  <div className="cs_team_contact">
-                    <div className="cs_team_social">
-                      <a href="#"><i className="fa-brands fa-facebook-f"></i></a>
-                      <a href="#"><i className="fa-brands fa-linkedin-in"></i></a>
-                      <a href="#"><i className="fa-brands fa-x-twitter"></i></a>
-                      <a href="#"><i className="fa-brands fa-instagram"></i></a>
-                    </div>
-                    <Link  to="/appointment" aria-label="Book an appointment" className="cs_btn_style_1 cs_white_color cs_semibold cs_radius_5">
-                    <img  src="/assets/img/icons/calendar.svg" alt="Calendar icon" />
-                    <span>Appointment</span>
-                    </Link>
-                  </div>
-                </div>
-                <div className="cs_team_info">
-                  <h3 className="cs_team_title cs_fs_20 cs_bold cs_mb_12">
-                    <Link  to="/doctor-details" aria-label="View doctor details">Dr. Philip Johnson <span>(DNB Ortho)</span></Link>
-                  </h3>
-                  <p className="cs_team_subtitle  mb-0">Joint Replacement & Medicine</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-sm-6">
-              <div className="cs_team_Style_1">
-                <div className="cs_team_img cs_radius_20 cs_mb_24 position-relative">
-                  <img  src="/assets/img/team_img_4.webp" alt="Doctor image" />
-                  <span className="cs_team_designation cs_gray3_bg cs_fs_14 position-absolute">Oncology</span>
-                  <div className="cs_team_contact">
-                    <div className="cs_team_social">
-                      <a href="#"><i className="fa-brands fa-facebook-f"></i></a>
-                      <a href="#"><i className="fa-brands fa-linkedin-in"></i></a>
-                      <a href="#"><i className="fa-brands fa-x-twitter"></i></a>
-                      <a href="#"><i className="fa-brands fa-instagram"></i></a>
-                    </div>
-                    <Link  to="/appointment" aria-label="Book an appointment" className="cs_btn_style_1 cs_white_color cs_semibold cs_radius_5">
-                    <img  src="/assets/img/icons/calendar.svg" alt="Calendar icon" />
-                    <span>Appointment</span>
-                    </Link>
-                  </div>
-                </div>
-                <div className="cs_team_info">
-                  <h3 className="cs_team_title cs_fs_20 cs_bold cs_mb_12">
-                    <Link  to="/doctor-details" aria-label="View doctor details">Dr. Aline Briscoe  <span>(MD Oncology)</span></Link>
-                  </h3>
-                  <p className="cs_team_subtitle  mb-0">Hematologist & Medical Oncologist</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* End Team Section */}
+
       {/* Start Testimonial Slider Section */}
       <section className="cs_testimonial_section_5 pb-0">
         <div className="container">
@@ -564,121 +449,116 @@ const AboutUs = () => {
           </div>
         </div>
       </section>
-      {/* End Testimonial Slider Section */}
-      {/* Start Appointment Section */}
-      <section className="cs_appointment_section_3">
+      {/* Start Appointment & Map Section */}
+      <section className="cs_appointment_section_custom py-5">
         <div className="container">
-          <div className="row cs_gap_y_24">
-            <div className="col-xl-12 order-xl-2">
-              <div className="cs_appointment_right">
-                <div className="row cs_gap_y_24 align-items-end">
-                  <div className="col-xl-8 col-lg-12 order-xl-2">
-                    <div className="cs_appointment_container">
-                      <div className="cs_appointment_heading cs_mb_48 cs_mb_lg_40">
-                        <h2 className="cs_fs_40 cs_semibold cs_mb_6">Book an Appointment</h2>
-                        <p className="mb-0">Fill the details below — we'll confirm within 2hrs.</p>
-                      </div>
-                      <div className="cs_appointment_form_wrapper cs_gray3_bg cs_radius_20">
-                        <form action="#" className="cs_appointment_form_2 cs_type_1 row cs_gap_y_24">
-                          <div className="col-12">
-                            <div className="cs_input_wrap cs_white_bg cs_radius_5">
-                              <label htmlFor="appt-name">Full Name</label>
-                              <input  type="text" name="name" id="appt-name" className="cs_form_field" placeholder="Enter your name" autocomplete="off" />
-                            </div>
-                          </div>
-                          <div className="col-sm-6">
-                            <div className="cs_input_wrap cs_white_bg cs_radius_5">
-                              <label htmlFor="appt-phone">Phone Number</label>
-                              <input  type="text" name="phone" id="appt-phone" className="cs_form_field" placeholder="Enter your phone" autocomplete="off" />
-                            </div>
-                          </div>
-                          <div className="col-sm-6">
-                            <div className="cs_input_wrap cs_white_bg cs_radius_5">
-                              <label htmlFor="appt-email">Email Address</label>
-                              <input  type="email" name="email" id="appt-email" className="cs_form_field" placeholder="Enter your email address" autocomplete="off" />
-                            </div>
-                          </div>
-                          <div className="col-sm-6">
-                            <div className="cs_input_wrap cs_white_bg cs_radius_5">
-                              <label htmlFor="appt-department">Department</label>
-                              <select className="cs_form_field cs_choice" name="department" id="appt-department">
-                                <option selected disabled>Select department</option>
-                                <option>Sick Child Care</option>
-                                <option>Well Child Daycare</option>
-                                <option>Post-Hospital Transition</option>
-                                <option>Emergency Needs</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="col-sm-6">
-                            <div className="cs_input_wrap cs_white_bg cs_radius_5">
-                              <label htmlFor="appt-doctor">Preferred Doctor</label>
-                              <select className="cs_form_field cs_choice" name="doctor" id="appt-doctor">
-                                <option selected disabled>Select doctor</option>
-                                <option>Dr. Gregory Bynum</option>
-                                <option>Dr. Lori Fletcher</option>
-                                <option>Dr. Philip Johnson</option>
-                                <option>Dr. Aline Briscoe</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="col-sm-6">
-                            <div className="cs_input_wrap cs_white_bg cs_radius_5 position-relative">
-                              <label htmlFor="appt-date">Date</label>
-                              <input  type="text" name="date" id="appt-date" className="cs_form_field cs_datepicker" data-format="Y-m-d" placeholder="Select date" />
-                              <img  src="/assets/img/icons/calendar.svg" alt="Calendar icon" className="cs_date_icon position-absolute" />
-                            </div>
-                          </div>
-                          <div className="col-sm-6">
-                            <div className="cs_input_wrap cs_white_bg cs_radius_5 position-relative">
-                              <label htmlFor="appt-time">Preferred Time</label>
-                              <input  type="text" name="time" id="appt-time" className="cs_form_field cs_timepicker" data-format="h:i K" placeholder="Select preferred time" />
-                              <span className="cs_time_icon position-absolute"></span>
-                            </div>
-                          </div>
-                          <div className="col-12">
-                            <div className="cs_input_wrap cs_white_bg cs_radius_5">
-                              <label htmlFor="appt-message">Additional Notes (optional)</label>
-                              <textarea name="message" rows="3" id="appt-message" className="cs_form_field" placeholder="Describe your symptom here..."></textarea>
-                            </div>
-                          </div>
-                          <div className="col-12">
-                            <button type="submit" aria-label="Confirm appointment" className="cs_btn_style_2 cs_primary_color cs_semibold cs_radius_5">
-                            <span>Confirm Appointment</span>
-                            <img  src="/assets/img/icons/arrow-right.svg" alt="Arrow" />
-                            </button>
-                          </div>
-                        </form>
+          {/* Appointment Booking Form (Above) */}
+          <div className="cs_appointment_container_wrap mb-5">
+            <div className="cs_section_heading_style_1 cs_mb_32">
+              <p className="cs_section_subtitle cs_accent_color cs_fs_14 cs_mb_12">// Easy Online Scheduling</p>
+              <h2 className="cs_fs_40 cs_semibold mb-0">Book an Appointment</h2>
+              <p className="text-secondary mt-2">Fill out the details below — our healthcare team will confirm within 2 hours.</p>
+            </div>
+            <div className="row cs_gap_y_30 align-items-stretch">
+              <div className="col-lg-8">
+                <div className="cs_appointment_form_wrapper cs_gray3_bg cs_radius_20 p-4 p-md-5 h-100">
+                  <form action="#" className="cs_appointment_form_2 cs_type_1 row cs_gap_y_24">
+                    <div className="col-12">
+                      <div className="cs_input_wrap cs_white_bg cs_radius_5 p-2">
+                        <label htmlFor="appt-name" className="cs_fs_14 cs_semibold text-secondary d-block mb-1">Full Name</label>
+                        <input type="text" name="name" id="appt-name" className="cs_form_field border-0 w-100" placeholder="Enter your full name" autoComplete="off" />
                       </div>
                     </div>
+                    <div className="col-sm-6">
+                      <div className="cs_input_wrap cs_white_bg cs_radius_5 p-2">
+                        <label htmlFor="appt-phone" className="cs_fs_14 cs_semibold text-secondary d-block mb-1">Phone Number</label>
+                        <input type="text" name="phone" id="appt-phone" className="cs_form_field border-0 w-100" placeholder="Enter your phone" autoComplete="off" />
+                      </div>
+                    </div>
+                    <div className="col-sm-6">
+                      <div className="cs_input_wrap cs_white_bg cs_radius_5 p-2">
+                        <label htmlFor="appt-email" className="cs_fs_14 cs_semibold text-secondary d-block mb-1">Email Address</label>
+                        <input type="email" name="email" id="appt-email" className="cs_form_field border-0 w-100" placeholder="Enter your email" autoComplete="off" />
+                      </div>
+                    </div>
+                    <div className="col-sm-6">
+                      <div className="cs_input_wrap cs_white_bg cs_radius_5 p-2">
+                        <label htmlFor="appt-department" className="cs_fs_14 cs_semibold text-secondary d-block mb-1">Service Type</label>
+                        <select className="cs_form_field border-0 w-100 bg-transparent" name="department" id="appt-department" defaultValue="">
+                          <option value="" disabled>Select service</option>
+                          <option value="nursing">Home Nursing Care</option>
+                          <option value="elderly">Elderly & Aged Care</option>
+                          <option value="postnatal">Postnatal Confinement Care</option>
+                          <option value="physio">Physiotherapy Services</option>
+                          <option value="disability">Disability Support Care</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="col-sm-6">
+                      <div className="cs_input_wrap cs_white_bg cs_radius_5 p-2">
+                        <label htmlFor="appt-date" className="cs_fs_14 cs_semibold text-secondary d-block mb-1">Preferred Date</label>
+                        <input type="date" name="date" id="appt-date" className="cs_form_field border-0 w-100" />
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="cs_input_wrap cs_white_bg cs_radius_5 p-2">
+                        <label htmlFor="appt-message" className="cs_fs_14 cs_semibold text-secondary d-block mb-1">Additional Notes (Optional)</label>
+                        <textarea name="message" rows="3" id="appt-message" className="cs_form_field border-0 w-100" placeholder="Describe patient needs or specific requests..."></textarea>
+                      </div>
+                    </div>
+                    <div className="col-12 mt-3">
+                      <button type="submit" aria-label="Confirm appointment" className="cs_btn_style_1 cs_accent_bg cs_white_color cs_semibold cs_radius_5 border-0 px-4 py-3">
+                        <span>Confirm Appointment</span>
+                        <i className="fa-solid fa-arrow-right ms-2"></i>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div className="col-lg-4">
+                <div className="cs_appointment_promise cs_radius_20 overflow-hidden position-relative h-100 cs_accent_bg p-4 text-white d-flex flex-column justify-content-between">
+                  <div>
+                    <span className="cs_fs_14 text-uppercase tracking-wider opacity-75 d-block mb-2">// Direct Care Promise</span>
+                    <h3 className="cs_fs_24 cs_semibold text-white mb-3">Your Family's Comfort, Our Gentle Guarantee.</h3>
+                    <p className="opacity-90 cs_fs_15 mb-4">
+                      All First Choice caretakers and support staff are 100% directly employed and background-checked for absolute safety and compassion.
+                    </p>
                   </div>
-                  <div className="col-xl-4 col-lg-12">
-                    <div className="cs_appointment_promise cs_radius_20 overflow-hidden position-relative">
-                      <h3 className="cs_appointment_promise_title cs_fs_24 cs_semibold cs_primary_color mb-0">Your Child's Health, Our Gentle Promise.</h3>
-                      <div className="cs_appointment_promise_img">
-                        <img  src="/assets/img/appointment_img_3.webp" alt="Hospital care team" />
-                      </div>
-                    </div>
+                  <div className="cs_promise_img_wrap cs_radius_15 overflow-hidden mt-3">
+                    <img src="/assets/img/appointment_img_3.webp" alt="First Choice Healthcare Team" className="w-100 object-fit-cover" style={{ maxHeight: '220px' }} />
                   </div>
                 </div>
               </div>
             </div>
-            <div className="col-xl-7">
-              <div className="cs_appointment_map cs_radius_20 position-relative overflow-hidden border shadow-sm">
-                <div className="bg-white p-3 border-bottom d-flex align-items-center gap-3">
-                  <img src="/assets/img/icons/location-pin.svg" alt="Location Pin" style={{ width: '28px', height: '28px' }} />
-                  <div>
-                    <strong className="d-block text-dark cs_fs_16">First Choice Medical Services HQ</strong>
-                    <span className="text-muted cs_fs_14">P.O.Box 15496, Bldg No. 76, Office No. 04, C-Ring Road, Umm Ghuwailina, Doha – State of Qatar</span>
-                  </div>
+          </div>
+
+          {/* Map Div (Below Appointment Form) */}
+          <div className="cs_map_container_wrap mt-5 pt-3">
+            <div className="cs_section_heading_style_1 cs_mb_24">
+              <p className="cs_section_subtitle cs_accent_color cs_fs_14 cs_mb_8">// Visit Our Headquarters</p>
+              <h3 className="cs_fs_28 cs_semibold mb-0">Our Doha Location</h3>
+            </div>
+            <div className="cs_appointment_map cs_radius_20 position-relative overflow-hidden border shadow-sm">
+              <div className="bg-white p-3 border-bottom d-flex align-items-center gap-3">
+                <img src="/assets/img/icons/location-pin.svg" alt="Location Pin" style={{ width: '28px', height: '28px' }} />
+                <div>
+                  <strong className="d-block text-dark cs_fs_16">First Choice Medical Services HQ</strong>
+                  <span className="text-muted cs_fs_14">P.O.Box 15496, Bldg No. 76, Office No. 04, C-Ring Road, Umm Ghuwailina, Doha – State of Qatar</span>
                 </div>
-                <iframe src="https://maps.google.com/maps?q=P.O.Box+15496,+Bldg+No.+76,+Office+No.+04,+C-Ring+Road,+Umm+Ghuwailina,+Doha,+Qatar&amp;t=&amp;z=16&amp;ie=UTF8&amp;iwloc=&amp;output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen title="First Choice Medical Services Qatar Location Map" style={{ width: '100%', height: '420px', border: 0 }}></iframe>
               </div>
+              <iframe 
+                src="https://maps.google.com/maps?q=P.O.Box+15496,+Bldg+No.+76,+Office+No.+04,+C-Ring+Road,+Umm+Ghuwailina,+Doha,+Qatar&amp;t=&amp;z=16&amp;ie=UTF8&amp;iwloc=&amp;output=embed" 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade" 
+                allowFullScreen 
+                title="First Choice Medical Services Qatar Location Map" 
+                style={{ width: '100%', height: '420px', border: 0 }}
+              ></iframe>
             </div>
           </div>
         </div>
       </section>
-      {/* End Appointment Section */}
+      {/* End Appointment & Map Section */}
     </main>
     {/* End Main Content */}
     

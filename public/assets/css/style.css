@@ -1386,7 +1386,7 @@ label {
   }
   .cs_site_header .menu-item-has-children > a::after {
     content: "\f078";
-    font-family: "Font Awesome 7 Free";
+    font-family: "Font Awesome 6 Free", "Font Awesome 7 Free", "FontAwesome";
     font-size: 12px;
     font-weight: 900;
     position: absolute;

@@ -32,17 +32,6 @@ const Header = () => {
                       <span>Doha, Qatar</span>
                     </Link>
                   </li>
-                  <li className="cs_language_select cs_fs_14 cs_white_color position-relative">
-                    <span className="cs_language_switcher">
-                      <img src="/assets/img/icons/global.svg" alt="Language icon" />
-                      <span className="cs_contact_icon">Lang:</span>
-                      <span className="cs_language text-capitalize">Eng / العربية</span> 
-                    </span>
-                    <div className="cs_language_dropdown">
-                      <button data-lang="eng">ENG</button>
-                      <button data-lang="ara">العربية</button>
-                    </div>
-                  </li>
                 </ul>
               </div>
             </div>
@@ -71,7 +60,7 @@ const Header = () => {
                           <li><Link to="/service-details">Elderly Care</Link></li>
                           <li><Link to="/patient-resource">Infant & Mother Care</Link></li>
                           <li><Link to="/facilities">Physiotherapy Services</Link></li>
-                          <li><Link to="/packages">Postnatal Confinement Care</Link></li>
+                          <li><Link to="/service-details">Postnatal Confinement Care</Link></li>
                         </ul>
                       </li>
                       <li className="menu-item-has-children">

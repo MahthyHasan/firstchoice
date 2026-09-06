@@ -95,7 +95,7 @@ const ServiceDetails = () => {
                       <li className="mb-2"><Link to="/service-details" className="text-success fw-bold">2. Elderly Care Services</Link></li>
                       <li className="mb-2"><Link to="/patient-resource" className="text-dark fw-medium">3. Infant & Mother Care</Link></li>
                       <li className="mb-2"><Link to="/facilities" className="text-dark fw-medium">4. Physiotherapy Services</Link></li>
-                      <li className="mb-2"><Link to="/packages" className="text-dark fw-medium">5. Postnatal Confinement Care</Link></li>
+                      <li className="mb-2"><Link to="/service-details" className="text-dark fw-medium">5. Postnatal Confinement Care</Link></li>
                     </ul>
                   </div>
 

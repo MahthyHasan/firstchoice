@@ -1,24 +1,47 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import serverlessExpress from '@vendia/serverless-express';
-import { Callback, Context, Handler } from 'aws-lambda';
+import * as cookieParser from 'cookie-parser';
+import { AllExceptionsFilter } from './common/all-exceptions.filter';
 
-let server: Handler;
+let cachedServer: any;
 
-async function bootstrap(): Promise<Handler> {
-  const app = await NestFactory.create(AppModule, { cors: true });
-  app.setGlobalPrefix('api');
-  await app.init();
+async function bootstrapServer() {
+  if (!cachedServer) {
+    const app = await NestFactory.create(AppModule);
+    
+    app.setGlobalPrefix('api');
+    app.useGlobalFilters(new AllExceptionsFilter());
+    app.use(cookieParser());
+    
+    app.enableCors({
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const allowedOrigins = [
+          'http://localhost:5173',
+          'http://localhost:5174',
+          'http://localhost:5175',
+          'http://localhost:3000',
+          'https://www.firstcmedical.com',
+          'https://firstcmedical.com',
+        ];
+        if (allowedOrigins.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin)) {
+          callback(null, true);
+        } else {
+          callback(null, true);
+        }
+      },
+      credentials: true,
+    });
 
-  const expressApp = app.getHttpAdapter().getInstance();
-  return serverlessExpress({ app: expressApp });
+    await app.init();
+    cachedServer = app.getHttpAdapter().getInstance();
+  }
+  return cachedServer;
 }
 
-export const handler: Handler = async (event: any, context: Context, callback: Callback) => {
-  if (!server) {
-    server = await bootstrap();
-  }
-  return server(event, context, callback);
-};
+export default async function handler(req: any, res: any) {
+  const server = await bootstrapServer();
+  return server(req, res);
+}
 
-export default handler;
+module.exports = handler;

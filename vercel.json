@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "server/src/lambda.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["server/src/mail/templates/**", "server/dist/mail/templates/**"]
+      }
     },
     {
       "src": "package.json",

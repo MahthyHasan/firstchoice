@@ -1,11 +1,23 @@
 import { Controller, Post, Get, Patch, Body, Query, Req, Res, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
+
+  private get appUrl(): string {
+    return (
+      this.configService.get<string>('APP_URL') ||
+      this.configService.get<string>('CLIENT_URL') ||
+      'https://www.firstcmedical.com'
+    );
+  }
 
   @Post('register')
   async register(@Body() body: { fullName: string; email: string; password: string; phone: string; role?: any }) {
@@ -17,13 +29,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(@Body() body: { email: string; password: string }, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.login(body);
-    
-    // Set refreshToken cookie (httpOnly, Secure in prod, SameSite=Strict)
+
     res.cookie('refreshToken', result.refreshToken, {
       httpOnly: true,
-      secure: false, // Set to true in HTTPS production environment
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return {
@@ -61,8 +72,31 @@ export class AuthController {
   }
 
   @Get('verify-email')
-  async verifyEmail(@Query('token') token: string) {
-    const result = await this.authService.verifyEmail(token);
+  async verifyEmail(
+    @Query('token') token: string,
+    @Query('id') id: string,
+    @Res() res: Response,
+    @Req() req: Request,
+  ) {
+    const isValid = await this.authService.verifyEmail(token, id);
+    if (req.headers.accept?.includes('application/json')) {
+      if (isValid) {
+        return res.json({ success: true, message: 'Email verified successfully!' });
+      }
+      return res.status(400).json({ success: false, message: 'Verification token invalid or expired.' });
+    }
+
+    if (isValid) {
+      return res.redirect(`${this.appUrl}/login?verified=true`);
+    } else {
+      return res.redirect(`${this.appUrl}/verify-error`);
+    }
+  }
+
+  @Post('resend-verification')
+  @HttpCode(HttpStatus.OK)
+  async resendVerification(@Body('email') email: string) {
+    const result = await this.authService.resendVerification(email);
     return { success: true, data: null, message: result.message };
   }
 
@@ -75,7 +109,7 @@ export class AuthController {
 
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  async resetPassword(@Body() body: { token: string; newPassword: string }) {
+  async resetPassword(@Body() body: { token: string; id?: string; newPassword: string }) {
     const result = await this.authService.resetPassword(body);
     return { success: true, data: null, message: result.message };
   }

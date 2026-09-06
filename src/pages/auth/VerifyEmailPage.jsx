@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../../utils/api';
 
-const EmailVerificationPage = () => {
+const VerifyEmailPage = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const id = searchParams.get('id');
@@ -22,10 +22,7 @@ const EmailVerificationPage = () => {
       }
 
       try {
-        const queryStr = id
-          ? `?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}`
-          : `?token=${encodeURIComponent(token)}`;
-
+        const queryStr = id ? `?token=${encodeURIComponent(token)}&id=${encodeURIComponent(id)}` : `?token=${encodeURIComponent(token)}`;
         const res = await apiFetch(`/auth/verify-email${queryStr}`, {
           headers: { Accept: 'application/json' },
         });
@@ -172,4 +169,4 @@ const EmailVerificationPage = () => {
   );
 };
 
-export default EmailVerificationPage;
+export default VerifyEmailPage;

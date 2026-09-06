@@ -26,15 +26,27 @@ export class User {
   role: UserRole;
 
   @Prop({ default: false })
-  isVerified: boolean;
+  isEmailVerified: boolean;
 
   @Prop({ default: null })
   emailVerificationToken: string | null;
 
+  @Prop({ default: null, type: Date })
+  emailVerificationExpires: Date | null;
+
+  @Prop({ default: null, type: Date })
+  lastResendAt: Date | null;
+
+  @Prop({ default: '' })
+  address: string;
+
+  @Prop({ default: false })
+  isVerified: boolean;
+
   @Prop({ default: null })
   resetPasswordToken: string | null;
 
-  @Prop({ default: null })
+  @Prop({ default: null, type: Date })
   resetPasswordExpiry: Date | null;
 
   @Prop({ default: 0 })

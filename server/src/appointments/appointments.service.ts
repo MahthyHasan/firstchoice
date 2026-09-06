@@ -5,6 +5,7 @@ import { Appointment, AppointmentDocument, AppointmentStatus, ServiceType } from
 import { User, UserDocument, UserRole } from '../users/user.schema';
 import { StaffService } from '../staff/staff.service';
 import { WaitlistService } from '../waitlist/waitlist.service';
+import { EmailService } from '../notifications/email.service';
 
 const RESCHEDULE_CUTOFF_HOURS = 24;
 const LATE_CANCEL_THRESHOLD_HOURS = 12;
@@ -16,6 +17,7 @@ export class AppointmentsService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private staffService: StaffService,
     private waitlistService: WaitlistService,
+    private emailService: EmailService,
   ) {}
 
   private generateAllSlots(): string[] {
@@ -34,9 +36,8 @@ export class AppointmentsService {
     }
 
     const dateObj = new Date(dateStr);
-    const dayOfWeek = dateObj.getDay(); // 0=Sun, 1=Mon...
+    const dayOfWeek = dateObj.getDay();
 
-    // Query active staff covering service on this day
     const activeStaff = await this.staffService.findActiveByServiceAndDay(service, dayOfWeek);
     const staffCapacity = activeStaff.length > 0 ? activeStaff.length : 3;
 
@@ -89,7 +90,6 @@ export class AppointmentsService {
   }
 
   async create(user: UserDocument, dto: { serviceType: ServiceType; preferredDate: string; preferredTime: string; notes?: string; intakeResponses?: any }) {
-    // Check patient restriction
     const patientUser = await this.userModel.findById(user._id).exec();
     if (patientUser?.bookingRestricted) {
       throw new ForbiddenException('Your account is restricted from creating new bookings due to multiple late cancellations or no-shows. Please contact support.');
@@ -100,7 +100,6 @@ export class AppointmentsService {
       throw new BadRequestException('Invalid preferred date');
     }
 
-    // Auto-assign least-busy staff member
     const dayOfWeek = prefDate.getDay();
     const activeStaff = await this.staffService.findActiveByServiceAndDay(dto.serviceType, dayOfWeek);
 
@@ -111,7 +110,6 @@ export class AppointmentsService {
       const endOfDay = new Date(dto.preferredDate);
       endOfDay.setUTCHours(23, 59, 59, 999);
 
-      // Find staff with lowest booking count for this slot
       let lowestCount = Infinity;
       for (const staff of activeStaff) {
         const count = await this.appointmentModel.countDocuments({
@@ -143,6 +141,12 @@ export class AppointmentsService {
     });
 
     await appointment.save();
+
+    // Trigger Email Notification
+    if (appointment.patientEmail) {
+      await this.emailService.sendBookingConfirmation(appointment.patientEmail, appointment);
+    }
+
     return appointment;
   }
 
@@ -204,9 +208,14 @@ export class AppointmentsService {
     });
 
     await appointment.save();
+
+    // Trigger Email Notification
+    if (appointment.patientEmail) {
+      await this.emailService.sendBookingConfirmation(appointment.patientEmail, appointment);
+    }
+
     return appointment;
   }
-
 
   async getMyAppointments(userId: string) {
     return this.appointmentModel
@@ -240,7 +249,7 @@ export class AppointmentsService {
     }
 
     const page = Math.max(1, Number(query.page) || 1);
-    const limit = Math.max(1, Number(query.limit) || 20);
+    const limit = Math.max(1, Number(query.limit) || 50);
     const skip = (page - 1) * limit;
 
     const [items, total] = await Promise.all([
@@ -275,6 +284,11 @@ export class AppointmentsService {
     if (adminNotes !== undefined) appointment.adminNotes = adminNotes;
     appointment.emailSentAt = new Date();
     await appointment.save();
+
+    if (appointment.patientEmail) {
+      await this.emailService.sendBookingStatusUpdate(appointment.patientEmail, appointment, adminNotes);
+    }
+
     return appointment;
   }
 
@@ -294,13 +308,11 @@ export class AppointmentsService {
       throw new BadRequestException(`Rescheduling is only allowed at least ${RESCHEDULE_CUTOFF_HOURS} hours prior to appointment time.`);
     }
 
-    // Check new slot availability
     const avail = await this.getAvailability(dto.newDate, appointment.serviceType);
     if (!avail.availableSlots.includes(dto.newTime)) {
       throw new BadRequestException('Selected date/time slot is fully booked');
     }
 
-    // Record history
     appointment.rescheduleHistory.push({
       fromDate: appointment.rescheduledDate || appointment.preferredDate,
       fromTime: appointment.rescheduledTime || appointment.preferredTime,
@@ -311,7 +323,13 @@ export class AppointmentsService {
 
     appointment.rescheduledDate = new Date(dto.newDate);
     appointment.rescheduledTime = dto.newTime;
+    appointment.status = AppointmentStatus.CONFIRMED;
     await appointment.save();
+
+    if (appointment.patientEmail) {
+      await this.emailService.sendBookingStatusUpdate(appointment.patientEmail, appointment);
+    }
+
     return appointment;
   }
 
@@ -331,7 +349,6 @@ export class AppointmentsService {
       isLateCancel = true;
       appointment.lateCancellation = true;
 
-      // Update patient stats
       const patient = await this.userModel.findById(appointment.patientId).exec();
       if (patient) {
         patient.lateCancelCount = (patient.lateCancelCount || 0) + 1;
@@ -346,7 +363,10 @@ export class AppointmentsService {
     if (reason) appointment.adminNotes = reason;
     await appointment.save();
 
-    // Trigger waitlist auto-notification for the freed slot
+    if (appointment.patientEmail) {
+      await this.emailService.sendBookingStatusUpdate(appointment.patientEmail, appointment, reason);
+    }
+
     await this.waitlistService.notifyNextInLine(
       appointment.serviceType,
       appointment.rescheduledDate || appointment.preferredDate,
@@ -369,8 +389,14 @@ export class AppointmentsService {
 
     appointment.rescheduledDate = new Date(dto.rescheduledDate);
     appointment.rescheduledTime = dto.rescheduledTime;
+    appointment.status = AppointmentStatus.CONFIRMED;
     if (dto.adminNotes !== undefined) appointment.adminNotes = dto.adminNotes;
     await appointment.save();
+
+    if (appointment.patientEmail) {
+      await this.emailService.sendBookingStatusUpdate(appointment.patientEmail, appointment, dto.adminNotes);
+    }
+
     return appointment;
   }
 
@@ -380,6 +406,11 @@ export class AppointmentsService {
 
     appointment.status = AppointmentStatus.COMPLETED;
     await appointment.save();
+
+    if (appointment.patientEmail) {
+      await this.emailService.sendBookingStatusUpdate(appointment.patientEmail, appointment);
+    }
+
     return appointment;
   }
 
@@ -389,7 +420,38 @@ export class AppointmentsService {
     return { message: 'Appointment deleted successfully' };
   }
 
+  async getStats() {
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+    const [thisMonth, pending, confirmedToday, completedThisMonth] = await Promise.all([
+      this.appointmentModel.countDocuments({ createdAt: { $gte: firstDayOfMonth } }).exec(),
+      this.appointmentModel.countDocuments({ status: AppointmentStatus.PENDING }).exec(),
+      this.appointmentModel.countDocuments({
+        status: AppointmentStatus.CONFIRMED,
+        $or: [
+          { preferredDate: { $gte: startOfToday, $lte: endOfToday } },
+          { rescheduledDate: { $gte: startOfToday, $lte: endOfToday } },
+        ],
+      }).exec(),
+      this.appointmentModel.countDocuments({
+        status: AppointmentStatus.COMPLETED,
+        updatedAt: { $gte: firstDayOfMonth },
+      }).exec(),
+    ]);
+
+    return {
+      thisMonth,
+      pending,
+      confirmedToday,
+      completedThisMonth,
+    };
+  }
+
   async getSummaryStats() {
+    const stats = await this.getStats();
     const totalAppointments = await this.appointmentModel.countDocuments().exec();
     const pendingCount = await this.appointmentModel.countDocuments({ status: AppointmentStatus.PENDING }).exec();
     const confirmedCount = await this.appointmentModel.countDocuments({ status: AppointmentStatus.CONFIRMED }).exec();
@@ -398,7 +460,7 @@ export class AppointmentsService {
     const lateCancelCount = await this.appointmentModel.countDocuments({ lateCancellation: true }).exec();
 
     const byServiceRaw = await this.appointmentModel.aggregate([
-      { $group: { _id: '$serviceType', count: { $sum: 1 } } }
+      { $group: { _id: '$serviceType', count: { $sum: 1 } } },
     ]).exec();
 
     const byService = {
@@ -414,6 +476,7 @@ export class AppointmentsService {
     });
 
     return {
+      ...stats,
       total: totalAppointments,
       pending: pendingCount,
       confirmed: confirmedCount,
@@ -424,21 +487,72 @@ export class AppointmentsService {
     };
   }
 
-  // Heatmap: 7 Days (Sun-Sat) x 24 Hours grid matrix
+  // Returns array of { dayOfWeek: 0..6, timeSlot: "09:00", count: N }
   async getHeatmapData() {
     const appointments = await this.appointmentModel.find({ status: { $ne: AppointmentStatus.CANCELLED } }).exec();
-    const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
+    const countsMap: Record<string, number> = {};
+
+    const timeSlots = this.generateAllSlots();
 
     appointments.forEach((app) => {
       const date = new Date(app.rescheduledDate || app.preferredDate);
-      const day = date.getDay(); // 0..6
-      const timeStr = app.rescheduledTime || app.preferredTime || '09:00';
-      const hour = parseInt(timeStr.split(':')[0], 10) || 9;
-      if (day >= 0 && day < 7 && hour >= 0 && hour < 24) {
-        matrix[day][hour] += 1;
-      }
+      const dayOfWeek = date.getDay(); // 0=Sun..6=Sat
+      const rawTime = app.rescheduledTime || app.preferredTime || '09:00';
+      const key = `${dayOfWeek}_${rawTime}`;
+      countsMap[key] = (countsMap[key] || 0) + 1;
     });
 
-    return matrix;
+    const result: Array<{ dayOfWeek: number; timeSlot: string; count: number }> = [];
+
+    for (let day = 0; day < 7; day++) {
+      for (const slot of timeSlots) {
+        const key = `${day}_${slot}`;
+        result.push({
+          dayOfWeek: day,
+          timeSlot: slot,
+          count: countsMap[key] || 0,
+        });
+      }
+    }
+
+    return result;
+  }
+
+  async exportCsv(): Promise<string> {
+    const appointments = await this.appointmentModel
+      .find()
+      .populate('staffId', 'name')
+      .sort({ createdAt: -1 })
+      .exec();
+
+    const headers = [
+      'Appointment ID',
+      'Patient Name',
+      'Patient Email',
+      'Patient Phone',
+      'Service Type',
+      'Date',
+      'Time Slot',
+      'Status',
+      'Assigned Staff',
+      'Notes',
+      'Created At',
+    ];
+
+    const rows = appointments.map((app) => [
+      `"${app._id}"`,
+      `"${(app.patientName || '').replace(/"/g, '""')}"`,
+      `"${(app.patientEmail || '').replace(/"/g, '""')}"`,
+      `"${(app.patientPhone || '').replace(/"/g, '""')}"`,
+      `"${app.serviceType}"`,
+      `"${new Date(app.rescheduledDate || app.preferredDate).toLocaleDateString()}"`,
+      `"${app.rescheduledTime || app.preferredTime}"`,
+      `"${app.status}"`,
+      `"${(app.staffId as any)?.name || 'Unassigned'}"`,
+      `"${(app.notes || '').replace(/"/g, '""')}"`,
+      `"${new Date((app as any).createdAt || Date.now()).toISOString()}"`,
+    ]);
+
+    return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
   }
 }

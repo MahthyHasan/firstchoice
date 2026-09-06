@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Delete, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, Req, UseGuards } from '@nestjs/common';
 import { WaitlistService } from './waitlist.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -29,6 +29,14 @@ export class WaitlistController {
   async getAllWaitlist() {
     const data = await this.waitlistService.getAllWaitlist();
     return { success: true, data, message: 'All waitlist entries retrieved' };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch(':id/promote')
+  async promote(@Param('id') id: string) {
+    const data = await this.waitlistService.promoteToBooking(id);
+    return { success: true, data, message: 'Waitlist entry promoted to pending appointment' };
   }
 
   @UseGuards(JwtAuthGuard)

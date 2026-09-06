@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Waitlist, WaitlistDocument, WaitlistStatus } from './waitlist.schema';
+import { Appointment, AppointmentDocument, AppointmentStatus, ServiceType } from '../appointments/appointment.schema';
 
 @Injectable()
 export class WaitlistService {
-  constructor(@InjectModel(Waitlist.name) private waitlistModel: Model<WaitlistDocument>) {}
+  constructor(
+    @InjectModel(Waitlist.name) private waitlistModel: Model<WaitlistDocument>,
+    @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
+  ) {}
 
   async create(user: any, body: { service: string; preferredDate: string; preferredTimeRange?: { start: string; end: string } }) {
     const newEntry = new this.waitlistModel({
@@ -30,6 +34,37 @@ export class WaitlistService {
     return this.waitlistModel.find().sort({ createdAt: -1 }).exec();
   }
 
+  async promoteToBooking(id: string) {
+    const entry = await this.waitlistModel.findById(id).exec();
+    if (!entry) {
+      throw new NotFoundException('Waitlist entry not found');
+    }
+
+    // Determine service type enum
+    let serviceEnum = ServiceType.HOME_NURSING;
+    if (Object.values(ServiceType).includes(entry.service as ServiceType)) {
+      serviceEnum = entry.service as ServiceType;
+    }
+
+    const newAppointment = new this.appointmentModel({
+      patientId: entry.patientId || new Types.ObjectId(),
+      patientName: entry.patientName,
+      patientEmail: entry.patientEmail,
+      patientPhone: entry.patientPhone,
+      serviceType: serviceEnum,
+      preferredDate: entry.preferredDate || new Date(),
+      preferredTime: entry.preferredTimeRange?.start || '09:00',
+      status: AppointmentStatus.PENDING,
+      notes: 'Promoted from Waitlist',
+    });
+
+    await newAppointment.save();
+    entry.status = WaitlistStatus.EXPIRED;
+    await entry.save();
+
+    return newAppointment;
+  }
+
   async remove(id: string, patientId?: string) {
     const query: any = { _id: id };
     if (patientId) query.patientId = patientId;
@@ -38,7 +73,6 @@ export class WaitlistService {
     return { message: 'Removed from waitlist' };
   }
 
-  // Triggered when an appointment slot is cancelled
   async notifyNextInLine(service: string, date: Date) {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
@@ -59,14 +93,11 @@ export class WaitlistService {
       waitingEntry.status = WaitlistStatus.NOTIFIED;
       waitingEntry.notifiedAt = new Date();
       await waitingEntry.save();
-
-      console.log(`[WAITLIST_NOTIFY] Alert sent to ${waitingEntry.patientEmail} for slot on ${date.toISOString().split('T')[0]}`);
       return waitingEntry;
     }
     return null;
   }
 
-  // Cron task checking for notifications > 2 hours old
   @Cron(CronExpression.EVERY_30_MINUTES)
   async handleExpiredNotifications() {
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
@@ -80,7 +111,6 @@ export class WaitlistService {
     for (const entry of expiredEntries) {
       entry.status = WaitlistStatus.EXPIRED;
       await entry.save();
-      // Offer to next person in line
       await this.notifyNextInLine(entry.service, entry.preferredDate);
     }
   }

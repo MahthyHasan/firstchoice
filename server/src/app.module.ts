@@ -8,6 +8,9 @@ import { StaffModule } from './staff/staff.module';
 import { WaitlistModule } from './waitlist/waitlist.module';
 import { IntakeFormsModule } from './intake-forms/intake-forms.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MailConfigModule } from './mail/mail.module';
+import { ContactModule } from './contact/contact.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -19,12 +22,15 @@ import { NotificationsModule } from './notifications/notifications.module';
       }),
       inject: [ConfigService],
     }),
+    MailConfigModule,
     AuthModule,
+    UsersModule,
     AppointmentsModule,
     StaffModule,
     WaitlistModule,
     IntakeFormsModule,
     NotificationsModule,
+    ContactModule,
   ],
 })
 export class AppModule {}

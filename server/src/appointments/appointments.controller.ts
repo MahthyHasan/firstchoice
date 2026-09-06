@@ -1,4 +1,5 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, Query, Req, Res, UseGuards, Header } from '@nestjs/common';
+import { Response } from 'express';
 import { AppointmentsService } from './appointments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -21,10 +22,36 @@ export class AppointmentsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @Get('stats')
+  async getStats() {
+    const data = await this.appointmentsService.getStats();
+    return { success: true, data, message: 'Appointment stats retrieved' };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('summary')
+  async getSummaryStats() {
+    const data = await this.appointmentsService.getSummaryStats();
+    return { success: true, data, message: 'Appointment summary statistics retrieved' };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @Get('heatmap')
   async getHeatmapData() {
     const data = await this.appointmentsService.getHeatmapData();
     return { success: true, data, message: 'Heatmap matrix retrieved' };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('export-csv')
+  async exportCsv(@Res() res: Response) {
+    const csvContent = await this.appointmentsService.exportCsv();
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=appointments-export.csv');
+    return res.send(csvContent);
   }
 
   @Post('public')
@@ -47,7 +74,6 @@ export class AppointmentsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PATIENT)
   @Post()
-
   async create(
     @Req() req: any,
     @Body() body: { serviceType: ServiceType; preferredDate: string; preferredTime: string; notes?: string; intakeResponses?: any },
@@ -62,14 +88,6 @@ export class AppointmentsController {
   async getMyAppointments(@Req() req: any) {
     const data = await this.appointmentsService.getMyAppointments(req.user._id);
     return { success: true, data, message: 'My appointments retrieved' };
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @Get('summary')
-  async getSummaryStats() {
-    const data = await this.appointmentsService.getSummaryStats();
-    return { success: true, data, message: 'Appointment statistics retrieved' };
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

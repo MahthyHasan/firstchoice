@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Appointment Status Updated — First Choice Medical</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #FAFAFC; font-family: Arial, sans-serif; color: #1F2937;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FAFAFC; padding: 40px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 600px; width: 100%;">
+          <!-- Header -->
+          <tr>
+            <td align="center" style="background-color: #0054D3; padding: 30px 20px;">
+              <img src="{{appUrl}}/assets/img/logo.png" alt="First Choice Medical Services" width="160" style="display: block; height: auto; border: 0;">
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              <h2 style="margin: 0 0 20px 0; color: #0054D3; font-size: 24px; font-weight: bold;">Appointment Status Update</h2>
+              <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.5; color: #1F2937;">Dear {{patientName}},</p>
+              <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.5; color: #4B5563;">
+                Your appointment status has been updated to: 
+                <strong style="color: #0054D3; text-transform: uppercase;">{{status}}</strong>.
+              </p>
+
+              <!-- Status Badge -->
+              <div style="margin-bottom: 24px;">
+                <span style="display: inline-block; padding: 6px 16px; font-size: 14px; font-weight: bold; border-radius: 16px; color: #ffffff; text-transform: uppercase;
+                  {{#if (eq status 'confirmed')}}background-color: #1D9E75;{{/if}}
+                  {{#if (eq status 'rescheduled')}}background-color: #EF9F27;{{/if}}
+                  {{#if (eq status 'cancelled')}}background-color: #E24B4A;{{/if}}
+                  {{#unless (or (eq status 'confirmed') (eq status 'rescheduled') (eq status 'cancelled'))}}background-color: #0054D3;{{/unless}}">
+                  Status: {{status}}
+                </span>
+              </div>
+
+              <!-- Appointment Details Table -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="12" style="border-collapse: collapse; background-color: #F9FAFB; border-radius: 8px; margin-bottom: 24px;">
+                <tr style="border-bottom: 1px solid #E5E7EB;">
+                  <td style="font-weight: bold; color: #4B5563; width: 40%;">Service:</td>
+                  <td style="color: #1F2937;">{{serviceType}}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #E5E7EB;">
+                  <td style="font-weight: bold; color: #4B5563;">Date:</td>
+                  <td style="color: #1F2937;">{{preferredDate}}</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: bold; color: #4B5563;">Time:</td>
+                  <td style="color: #1F2937;">{{preferredTime}}</td>
+                </tr>
+              </table>
+
+              {{#if adminNotes}}
+              <div style="background-color: #EFF6FF; border-left: 4px solid #0054D3; padding: 16px; border-radius: 4px; margin-bottom: 24px;">
+                <h4 style="margin: 0 0 6px 0; color: #0054D3; font-size: 14px; font-weight: bold;">Note from Care Team:</h4>
+                <p style="margin: 0; font-size: 14px; color: #1E40AF; line-height: 1.4;">{{adminNotes}}</p>
+              </div>
+              {{/if}}
+
+              <!-- CTA Button -->
+              <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 0 auto 20px auto;">
+                <tr>
+                  <td align="center" style="background-color: #0054D3; border-radius: 8px;">
+                    <a href="{{appUrl}}/dashboard" target="_blank" style="display: inline-block; padding: 12px 28px; font-size: 15px; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 8px;">View My Bookings</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #F3F4F6; padding: 20px; text-align: center; font-size: 12px; color: #6B7280; border-top: 1px solid #E5E7EB;">
+              <p style="margin: 0 0 6px 0;">P.O.Box 15496, Bldg No. 76, Office No. 04, C-Ring Road, Umm Ghuwailina, Doha – State of Qatar</p>
+              <p style="margin: 0;">contact@firstcmedical.com | &copy; {{year}} First Choice Medical Services</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

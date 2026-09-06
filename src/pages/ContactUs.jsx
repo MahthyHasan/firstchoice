@@ -1,8 +1,65 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import PageHeader from '../components/common/PageHeader';
+import { apiFetch } from '../utils/api';
 
 const ContactUs = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    service: 'nursing',
+    message: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState({ type: null, message: '' });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus({ type: null, message: '' });
+
+    try {
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: `[Requested Service: ${formData.service}]\n${formData.message}`,
+      };
+
+      const res = await apiFetch('/contact', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      if (res.success) {
+        setStatus({
+          type: 'success',
+          message: res.message || 'Your message has been sent. We will respond within 24 hours.',
+        });
+        setFormData({ name: '', email: '', phone: '', service: 'nursing', message: '' });
+      } else {
+        setStatus({
+          type: 'error',
+          message: res.message || 'Failed to send message. Please try again.',
+        });
+      }
+    } catch (err) {
+      setStatus({
+        type: 'error',
+        message: err.message || 'An unexpected error occurred. Please try again or call us directly.',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <main>
@@ -51,8 +108,8 @@ const ContactUs = () => {
                     </div>
                     <h3 className="cs_feature_title cs_fs_24 cs_medium mb-0">Email & Website</h3>
                   </div>
-                  <p className="mb-1"><a href="mailto:agentfcn@gmail.com" className="fw-bold text-dark">agentfcn@gmail.com</a></p>
-                  <p className="mb-0"><a href="https://www.ngtgroup-qa.com" target="_blank" rel="noopener noreferrer" className="cs_accent_color">www.ngtgroup-qa.com</a></p>
+                  <p className="mb-1"><a href="mailto:contact@firstcmedical.com" className="fw-bold text-dark">contact@firstcmedical.com</a></p>
+                  <p className="mb-0"><a href="https://www.firstcmedical.com" target="_blank" rel="noopener noreferrer" className="cs_accent_color">www.firstcmedical.com</a></p>
                 </div>
               </div>
               <div className="col-xl-3 col-md-6">
@@ -80,29 +137,73 @@ const ContactUs = () => {
                     <h2 className="cs_fs_40 cs_semibold cs_mb_12">Send Us a Message</h2>
                     <p className="mb-0 text-muted">Fill out the form below and our Qatar healthcare team will contact you shortly.</p>
                   </div>
-                  <form action="#" className="cs_appointment_form_1 row cs_gap_y_24">
+
+                  {status.message && (
+                    <div className={`alert ${status.type === 'success' ? 'alert-success' : 'alert-danger'} mb-4 text-center role="alert"`}>
+                      {status.type === 'success' && <i className="fa-solid fa-circle-check me-2"></i>}
+                      {status.type === 'error' && <i className="fa-solid fa-circle-exclamation me-2"></i>}
+                      {status.message}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSubmit} className="cs_appointment_form_1 row cs_gap_y_24">
                     <div className="col-sm-6">
                       <div className="cs_input_wrap cs_gray2_bg cs_radius_5">
-                        <label htmlFor="contact_name">Full Name</label>
-                        <input type="text" name="name" id="contact_name" className="cs_form_field" placeholder="Enter your full name" autoComplete="off" />
+                        <label htmlFor="contact_name">Full Name *</label>
+                        <input
+                          type="text"
+                          name="name"
+                          id="contact_name"
+                          className="cs_form_field"
+                          placeholder="Enter your full name"
+                          required
+                          value={formData.name}
+                          onChange={handleChange}
+                          autoComplete="off"
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="cs_input_wrap cs_gray2_bg cs_radius_5">
-                        <label htmlFor="contact_email">Email Address</label>
-                        <input type="email" name="email" id="contact_email" className="cs_form_field" placeholder="Enter your email" autoComplete="off" />
+                        <label htmlFor="contact_email">Email Address *</label>
+                        <input
+                          type="email"
+                          name="email"
+                          id="contact_email"
+                          className="cs_form_field"
+                          placeholder="Enter your email"
+                          required
+                          value={formData.email}
+                          onChange={handleChange}
+                          autoComplete="off"
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="cs_input_wrap cs_gray2_bg cs_radius_5">
                         <label htmlFor="contact_phone">Phone Number (Qatar)</label>
-                        <input type="text" name="phone" id="contact_phone" className="cs_form_field" placeholder="+974 XXXX XXXX" autoComplete="off" />
+                        <input
+                          type="text"
+                          name="phone"
+                          id="contact_phone"
+                          className="cs_form_field"
+                          placeholder="+974 XXXX XXXX"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          autoComplete="off"
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div className="cs_input_wrap cs_gray2_bg cs_radius_5">
                         <label htmlFor="contact_service">Service Needed</label>
-                        <select className="cs_form_field" id="contact_service" name="service">
+                        <select
+                          className="cs_form_field"
+                          id="contact_service"
+                          name="service"
+                          value={formData.service}
+                          onChange={handleChange}
+                        >
                           <option value="nursing">Home Nursing Care</option>
                           <option value="elderly">Elderly & Senior Care</option>
                           <option value="postnatal">Postnatal Confinement Care</option>
@@ -112,14 +213,34 @@ const ContactUs = () => {
                     </div>
                     <div className="col-12">
                       <div className="cs_input_wrap cs_gray2_bg cs_radius_5">
-                        <label htmlFor="contact_msg">Message / Requirements</label>
-                        <textarea name="message" id="contact_msg" rows="4" className="cs_form_field" placeholder="How can we assist you or your family member?"></textarea>
+                        <label htmlFor="contact_msg">Message / Requirements *</label>
+                        <textarea
+                          name="message"
+                          id="contact_msg"
+                          rows="4"
+                          className="cs_form_field"
+                          placeholder="How can we assist you or your family member?"
+                          required
+                          minLength={10}
+                          value={formData.message}
+                          onChange={handleChange}
+                        ></textarea>
                       </div>
                     </div>
                     <div className="col-12 text-center mt-3">
-                      <button type="submit" className="cs_btn_style_1 cs_accent_bg cs_white_color cs_radius_5">
-                        <span>Send Message</span>
-                        <span><i className="fa-solid fa-paper-plane ms-2"></i></span>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="cs_btn_style_1 cs_accent_bg cs_white_color cs_radius_5"
+                      >
+                        {loading ? (
+                          <span>Sending... <i className="fa-solid fa-spinner fa-spin ms-2"></i></span>
+                        ) : (
+                          <>
+                            <span>Send Message</span>
+                            <span><i className="fa-solid fa-paper-plane ms-2"></i></span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </form>

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Resend } from 'resend';
-import * as twilio from 'twilio';
+import twilio from 'twilio';
 
 @Injectable()
 export class NotificationsService {
@@ -18,7 +18,7 @@ export class NotificationsService {
     const accountSid = this.configService.get<string>('TWILIO_ACCOUNT_SID');
     const authToken = this.configService.get<string>('TWILIO_AUTH_TOKEN');
     if (accountSid && authToken) {
-      this.twilioClient = twilio(accountSid, authToken);
+      this.twilioClient = (twilio as any)(accountSid, authToken);
     }
   }
 

@@ -1,7 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <>
       <footer className="cs_footer_style_1 cs_primary_bg">
@@ -46,7 +64,7 @@ const Footer = () => {
                     <li><Link to="/service-details">Elderly Care</Link></li>
                     <li><Link to="/patient-resource">Infant & Mother Care</Link></li>
                     <li><Link to="/facilities">Physiotherapy</Link></li>
-                    <li><Link to="/packages">Postnatal Confinement</Link></li>
+                    <li><Link to="/service-details">Postnatal Confinement</Link></li>
                   </ul>
                 </div>
               </div>
@@ -106,7 +124,14 @@ const Footer = () => {
           </div>
         </div>
       </footer>
-      <button type="button" name="ScrollToTopBtn" className="cs_scrollup_btn" id="scrollToTopBtn">
+      <button 
+        type="button" 
+        name="ScrollToTopBtn" 
+        className={`cs_scrollup_btn ${showScrollTop ? 'show' : ''}`} 
+        id="scrollToTopBtn"
+        onClick={scrollToTop}
+        aria-label="Scroll to top"
+      >
         <i className="fa-solid fa-arrow-up"></i>
       </button>
     </>

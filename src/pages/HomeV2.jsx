@@ -1,7 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const HomeV2 = () => {
+  const [activeServiceIndex, setActiveServiceIndex] = useState(0);
+
+  const homeServices = [
+    {
+      title: "1. Nursing Care Services",
+      desc: "Home nursing care, 24-hour nursing, post-operative care, chronic disease monitoring, medication assistance, wound dressing, vital signs monitoring, personal hygiene, and mobility support.",
+      icon: "/assets/img/icons/cardiology2.svg",
+      img: "/assets/img/servicesBanner/NursingCare.png",
+      alt: "Home Nursing Care",
+      link: "/services"
+    },
+    {
+      title: "2. Elderly Care",
+      desc: "Elderly and senior care, residential aged care, daily assistance, personal hygiene, mobility support, and palliative comfort care at home.",
+      icon: "/assets/img/icons/neurology.svg",
+      img: "/assets/img/servicesBanner/ElderlyCarebanner.png",
+      alt: "Elderly Care",
+      link: "/service-details"
+    },
+    {
+      title: "3. Infant & Mother Care",
+      desc: "Postnatal confinement home care service, daily care of mother & baby, confinement meals, and light housekeeping support during recuperation.",
+      icon: "/assets/img/icons/child.svg",
+      img: "/assets/img/servicesBanner/InfantMotherCare.png",
+      alt: "Infant and Mother Care",
+      link: "/patient-resource"
+    },
+    {
+      title: "4. Physiotherapy Services",
+      desc: "In-home physical therapy, mobility rehabilitation, stroke recovery support, and individualized exercise plans for home-bound patients.",
+      icon: "/assets/img/icons/orthopedics.svg",
+      img: "/assets/img/servicesBanner/PhysiotherapyServices.png",
+      alt: "Physiotherapy Services",
+      link: "/facilities"
+    }
+  ];
   return (
     <>
       {/* Start Main Content */}
@@ -32,7 +68,7 @@ const HomeV2 = () => {
               </div>
               <div className="cs_hero_img_wrapper overflow-hidden position-relative">
                 <div className="cs_hero_img_1 cs_radius_20">
-                  <img src="/assets/img/hero_img_1.webp" alt="First Choice Healthcare Nursing Team" />
+                  <img src="/assets/img/hero_img_1.jpg" alt="First Choice Healthcare Nursing Team" />
                 </div>
                 <div className="cs_hero_img_2 position-absolute">
                   <img src="/assets/img/hero_img_2.webp" alt="In-home Patient Care" />
@@ -239,97 +275,33 @@ const HomeV2 = () => {
               </h2>
             </div>
             <div className="cs_service_grid_1">
-              <div className="cs_service_card_2 cs_gray2_bg cs_radius_20 active">
-                <div className="cs_service_left">
-                  <div className="cs_service_icon cs_center">
-                    <img src="/assets/img/icons/cardiology2.svg" alt="Nursing Care" />
-                  </div>
-                  <div className="cs_service_text">
-                    <h3 className="cs_service_title cs_fs_24 cs_medium mb-0">1. Nursing Care Services</h3>
-                    <div className="cs_short_desc">
-                      Home nursing care, 24-hour nursing, post-operative care, chronic disease monitoring, medication assistance, wound dressing, vital signs monitoring, personal hygiene, and mobility support.
+              {homeServices.map((service, index) => (
+                <div
+                  key={index}
+                  className={`cs_service_card_2 cs_gray2_bg cs_radius_20 ${activeServiceIndex === index ? 'active' : ''}`}
+                  onMouseEnter={() => setActiveServiceIndex(index)}
+                  onClick={() => setActiveServiceIndex(index)}
+                >
+                  <div className="cs_service_left">
+                    <div className="cs_service_icon cs_center">
+                      <img src={service.icon} alt={service.title} />
                     </div>
-                    <div className="cs_btn_wrap">
-                      <Link to="/services" className="cs_btn_style_2 cs_radius_5">
-                        <span>Learn More</span>
-                        <img src="/assets/img/icons/arrow2-right.svg" alt="Arrow icon" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-                <div className="cs_service_img cs_radius_20">
-                  <img src="/assets/img/service_img_1.webp" alt="Home Nursing" />
-                </div>
-              </div>
-
-              <div className="cs_service_card_2 cs_gray2_bg cs_radius_20">
-                <div className="cs_service_left">
-                  <div className="cs_service_icon cs_center">
-                    <img src="/assets/img/icons/neurology.svg" alt="Elderly Care" />
-                  </div>
-                  <div className="cs_service_text">
-                    <h3 className="cs_service_title cs_fs_24 cs_medium mb-0">2. Elderly Care</h3>
-                    <div className="cs_short_desc">
-                      Elderly and senior care, residential aged care, daily assistance, personal hygiene, mobility support, and palliative comfort care at home.
-                    </div>
-                    <div className="cs_btn_wrap">
-                      <Link to="/service-details" className="cs_btn_style_2 cs_radius_5">
-                        <span>Learn More</span>
-                        <img src="/assets/img/icons/arrow2-right.svg" alt="Arrow icon" />
-                      </Link>
+                    <div className="cs_service_text">
+                      <h3 className="cs_service_title cs_fs_24 cs_medium mb-0">{service.title}</h3>
+                      <div className="cs_short_desc">{service.desc}</div>
+                      <div className="cs_btn_wrap">
+                        <Link to={service.link} className="cs_btn_style_2 cs_radius_5">
+                          <span>Learn More</span>
+                          <img src="/assets/img/icons/arrow2-right.svg" alt="Arrow icon" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="cs_service_img cs_radius_20">
-                  <img src="/assets/img/service_img_2.webp" alt="Elderly Care" />
-                </div>
-              </div>
-
-              <div className="cs_service_card_2 cs_gray2_bg cs_radius_20">
-                <div className="cs_service_left">
-                  <div className="cs_service_icon cs_center">
-                    <img src="/assets/img/icons/child.svg" alt="Infant & Mother Care" />
-                  </div>
-                  <div className="cs_service_text">
-                    <h3 className="cs_service_title cs_fs_24 cs_medium mb-0">3. Infant & Mother Care</h3>
-                    <div className="cs_short_desc">
-                      Postnatal confinement home care service, daily care of mother & baby, confinement meals, and light housekeeping support during recuperation.
-                    </div>
-                    <div className="cs_btn_wrap">
-                      <Link to="/patient-resource" className="cs_btn_style_2 cs_radius_5">
-                        <span>Learn More</span>
-                        <img src="/assets/img/icons/arrow2-right.svg" alt="Arrow icon" />
-                      </Link>
-                    </div>
+                  <div className="cs_service_img cs_radius_20">
+                    <img src={service.img} alt={service.alt} />
                   </div>
                 </div>
-                <div className="cs_service_img cs_radius_20">
-                  <img src="/assets/img/service_img_6.webp" alt="Infant and Mother Care" />
-                </div>
-              </div>
-
-              <div className="cs_service_card_2 cs_gray2_bg cs_radius_20">
-                <div className="cs_service_left">
-                  <div className="cs_service_icon cs_center">
-                    <img src="/assets/img/icons/orthopedics.svg" alt="Physiotherapy" />
-                  </div>
-                  <div className="cs_service_text">
-                    <h3 className="cs_service_title cs_fs_24 cs_medium mb-0">4. Physiotherapy Services</h3>
-                    <div className="cs_short_desc">
-                      In-home physical therapy, mobility rehabilitation, stroke recovery support, and individualized exercise plans for home-bound patients.
-                    </div>
-                    <div className="cs_btn_wrap">
-                      <Link to="/facilities" className="cs_btn_style_2 cs_radius_5">
-                        <span>Learn More</span>
-                        <img src="/assets/img/icons/arrow2-right.svg" alt="Arrow icon" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-                <div className="cs_service_img cs_radius_20">
-                  <img src="/assets/img/service_img_8.webp" alt="Physiotherapy" />
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
@@ -341,7 +313,7 @@ const HomeV2 = () => {
             <div className="row align-items-center cs_gap_y_30">
               <div className="col-lg-6">
                 <div className="cs_radius_20 overflow-hidden shadow-sm">
-                  <img src="/assets/img/appointment_img_4.webp" alt="Postnatal Confinement Care Team" className="w-100" />
+                  <img src="/assets/img/appointment_img_4.png" alt="Postnatal Confinement Care Team" className="w-100" />
                 </div>
               </div>
               <div className="col-lg-6">

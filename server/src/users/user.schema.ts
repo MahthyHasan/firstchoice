@@ -36,6 +36,15 @@ export class User {
 
   @Prop({ default: null })
   resetPasswordExpiry: Date | null;
+
+  @Prop({ default: 0 })
+  noShowCount: number;
+
+  @Prop({ default: 0 })
+  lateCancelCount: number;
+
+  @Prop({ default: false })
+  bookingRestricted: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

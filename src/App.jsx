@@ -28,7 +28,6 @@ import ShopDetails from './pages/ShopDetails';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Facilities from './pages/Facilities';
-import Packages from './pages/Packages';
 import Pricing from './pages/Pricing';
 import Event from './pages/Event';
 import EventDetails from './pages/EventDetails';
@@ -92,7 +91,6 @@ function AppContent() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/facilities" element={<Facilities />} />
-        <Route path="/packages" element={<Packages />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/event" element={<Event />} />
         <Route path="/event-details" element={<EventDetails />} />

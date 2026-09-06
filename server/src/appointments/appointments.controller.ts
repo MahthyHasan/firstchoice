@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Body, Param, Query, Req, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Body, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -10,7 +10,6 @@ import { ServiceType } from './appointment.schema';
 export class AppointmentsController {
   constructor(private appointmentsService: AppointmentsService) {}
 
-  // Public endpoint to check availability
   @Get('availability')
   async getAvailability(
     @Query('date') date: string,
@@ -20,16 +19,43 @@ export class AppointmentsController {
     return { success: true, data, message: 'Available slots retrieved' };
   }
 
-  // Patient creates appointment
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Get('heatmap')
+  async getHeatmapData() {
+    const data = await this.appointmentsService.getHeatmapData();
+    return { success: true, data, message: 'Heatmap matrix retrieved' };
+  }
+
+  @Post('public')
+  async createPublic(
+    @Body() body: {
+      patientName: string;
+      patientEmail: string;
+      patientPhone: string;
+      serviceType: ServiceType;
+      preferredDate: string;
+      preferredTime?: string;
+      location?: string;
+      notes?: string;
+    },
+  ) {
+    const data = await this.appointmentsService.createPublic(body);
+    return { success: true, data, message: 'Appointment request submitted successfully!' };
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PATIENT)
   @Post()
-  async create(@Req() req: any, @Body() body: { serviceType: ServiceType; preferredDate: string; preferredTime: string; notes?: string }) {
+
+  async create(
+    @Req() req: any,
+    @Body() body: { serviceType: ServiceType; preferredDate: string; preferredTime: string; notes?: string; intakeResponses?: any },
+  ) {
     const data = await this.appointmentsService.create(req.user, body);
     return { success: true, data, message: 'Appointment booked successfully' };
   }
 
-  // Patient views own appointments
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.PATIENT)
   @Get('my')
@@ -38,7 +64,6 @@ export class AppointmentsController {
     return { success: true, data, message: 'My appointments retrieved' };
   }
 
-  // Admin gets stats & summary
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Get('summary')
@@ -47,7 +72,6 @@ export class AppointmentsController {
     return { success: true, data, message: 'Appointment statistics retrieved' };
   }
 
-  // Admin gets all appointments with filters & pagination
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Get()
@@ -64,7 +88,6 @@ export class AppointmentsController {
     return { success: true, data, message: 'Appointments retrieved' };
   }
 
-  // Get single appointment
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string, @Req() req: any) {
@@ -72,7 +95,6 @@ export class AppointmentsController {
     return { success: true, data, message: 'Appointment details retrieved' };
   }
 
-  // Admin confirms appointment
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Patch(':id/confirm')
@@ -81,15 +103,31 @@ export class AppointmentsController {
     return { success: true, data, message: 'Appointment confirmed' };
   }
 
-  // Admin or owning patient cancels appointment
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.PATIENT)
+  @Patch(':id/patient-reschedule')
+  async patientReschedule(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Body() body: { newDate: string; newTime: string },
+  ) {
+    const data = await this.appointmentsService.patientReschedule(id, req.user, body);
+    return { success: true, data, message: 'Appointment rescheduled successfully' };
+  }
+
   @UseGuards(JwtAuthGuard)
   @Patch(':id/cancel')
   async cancel(@Param('id') id: string, @Req() req: any, @Body('reason') reason?: string) {
-    const data = await this.appointmentsService.cancel(id, req.user, reason);
-    return { success: true, data, message: 'Appointment cancelled' };
+    const result = await this.appointmentsService.cancel(id, req.user, reason);
+    return {
+      success: true,
+      data: result.appointment,
+      message: result.isLateCancel
+        ? 'Appointment cancelled (marked as Late Cancellation)'
+        : 'Appointment cancelled successfully',
+    };
   }
 
-  // Admin reschedules appointment
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Patch(':id/reschedule')
@@ -101,7 +139,6 @@ export class AppointmentsController {
     return { success: true, data, message: 'Appointment rescheduled' };
   }
 
-  // Admin marks complete
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Patch(':id/complete')
@@ -110,7 +147,6 @@ export class AppointmentsController {
     return { success: true, data, message: 'Appointment marked as completed' };
   }
 
-  // Admin deletes appointment
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Delete(':id')

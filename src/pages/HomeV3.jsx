@@ -775,8 +775,15 @@ const HomeV3 = () => {
               </div>
             </div>
             <div className="col-xl-7">
-              <div className="cs_appointment_map cs_radius_20">
-                <iframe src="https://maps.google.com/maps?q=Doral,FL&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen title="Hospil location map"></iframe>
+              <div className="cs_appointment_map cs_radius_20 position-relative overflow-hidden border shadow-sm">
+                <div className="bg-white p-3 border-bottom d-flex align-items-center gap-3">
+                  <img src="/assets/img/icons/location-pin.svg" alt="Location Pin" style={{ width: '28px', height: '28px' }} />
+                  <div>
+                    <strong className="d-block text-dark cs_fs_16">First Choice Medical Services HQ</strong>
+                    <span className="text-muted cs_fs_14">P.O.Box 15496, Bldg No. 76, Office No. 04, C-Ring Road, Umm Ghuwailina, Doha – State of Qatar</span>
+                  </div>
+                </div>
+                <iframe src="https://maps.google.com/maps?q=P.O.Box+15496,+Bldg+No.+76,+Office+No.+04,+C-Ring+Road,+Umm+Ghuwailina,+Doha,+Qatar&amp;t=&amp;z=16&amp;ie=UTF8&amp;iwloc=&amp;output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen title="First Choice Medical Services Qatar Location Map" style={{ width: '100%', height: '420px', border: 0 }}></iframe>
               </div>
             </div>
           </div>

@@ -8,28 +8,28 @@ const Services = () => {
       title: "1. Nursing Care Services",
       desc: "Comprehensive home nursing solutions tailored to short-term recovery and long-term illness management.",
       tags: ["Home Nursing", "24-Hour Care", "Post-Operative Support", "Medication Assistance"],
-      img: "/assets/img/service_img_1.webp",
+      img: "/assets/img/servicesBanner/NursingCare.png",
       link: "/services"
     },
     {
       title: "2. Elderly & Senior Care",
       desc: "Compassionate in-home care giving seniors individualized support with dignity and comfort.",
       tags: ["Residential Aged Care", "Daily Hygiene", "Mobility Assistance", "Vital Signs Monitoring"],
-      img: "/assets/img/service_img_2.webp",
+      img: "/assets/img/servicesBanner/ElderlyCarebanner.png",
       link: "/service-details"
     },
     {
       title: "3. Infant & Mother Care",
       desc: "Specialized postnatal confinement home care assisting mothers with baby daily care and recuperation.",
       tags: ["Confinement Home Care", "Mother & Baby Care", "Confinement Meals", "Housekeeping Support"],
-      img: "/assets/img/service_img_6.webp",
+      img: "/assets/img/servicesBanner/InfantMotherCare.png",
       link: "/patient-resource"
     },
     {
       title: "4. Physiotherapy Services",
       desc: "In-home physical therapy and rehabilitation programs helping patients rebuild strength and mobility.",
       tags: ["Home Rehabilitation", "Stroke Recovery", "Joint Mobility", "Patient Support"],
-      img: "/assets/img/service_img_8.webp",
+      img: "/assets/img/servicesBanner/PhysiotherapyServices.png",
       link: "/facilities"
     }
   ];

@@ -4,6 +4,11 @@ import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  if (process.env.VERCEL) {
+    // Vercel serverless environment handles invocation via lambda.ts
+    return;
+  }
+
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
 
@@ -17,6 +22,6 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
-  logger.log(`First Choice NestJS Backend running on port ${port} with prefix /api`);
+  logger.log(`First Choice NestJS Backend running locally on port ${port} with prefix /api`);
 }
 bootstrap();

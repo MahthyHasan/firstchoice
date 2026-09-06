@@ -2,17 +2,22 @@ import { Injectable, NotFoundException, ForbiddenException, BadRequestException 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Appointment, AppointmentDocument, AppointmentStatus, ServiceType } from './appointment.schema';
-import { UserDocument, UserRole } from '../users/user.schema';
-import { EmailService } from '../notifications/email.service';
+import { User, UserDocument, UserRole } from '../users/user.schema';
+import { StaffService } from '../staff/staff.service';
+import { WaitlistService } from '../waitlist/waitlist.service';
+
+const RESCHEDULE_CUTOFF_HOURS = 24;
+const LATE_CANCEL_THRESHOLD_HOURS = 12;
 
 @Injectable()
 export class AppointmentsService {
   constructor(
     @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
-    private emailService: EmailService,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private staffService: StaffService,
+    private waitlistService: WaitlistService,
   ) {}
 
-  // Generate 30-min time slots between 08:00 and 17:00
   private generateAllSlots(): string[] {
     const slots: string[] = [];
     for (let hour = 8; hour < 17; hour++) {
@@ -23,10 +28,17 @@ export class AppointmentsService {
     return slots;
   }
 
-  async getAvailability(dateStr: string, service?: ServiceType): Promise<{ availableSlots: string[]; bookedSlots: string[] }> {
+  async getAvailability(dateStr: string, service: ServiceType = ServiceType.HOME_NURSING) {
     if (!dateStr) {
       throw new BadRequestException('Date is required (YYYY-MM-DD)');
     }
+
+    const dateObj = new Date(dateStr);
+    const dayOfWeek = dateObj.getDay(); // 0=Sun, 1=Mon...
+
+    // Query active staff covering service on this day
+    const activeStaff = await this.staffService.findActiveByServiceAndDay(service, dayOfWeek);
+    const staffCapacity = activeStaff.length > 0 ? activeStaff.length : 3;
 
     const startOfDay = new Date(dateStr);
     startOfDay.setUTCHours(0, 0, 0, 0);
@@ -34,39 +46,86 @@ export class AppointmentsService {
     const endOfDay = new Date(dateStr);
     endOfDay.setUTCHours(23, 59, 59, 999);
 
-    const query: any = {
+    const existingAppointments = await this.appointmentModel.find({
+      serviceType: service,
       status: { $in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED] },
       $or: [
         { preferredDate: { $gte: startOfDay, $lte: endOfDay } },
         { rescheduledDate: { $gte: startOfDay, $lte: endOfDay } },
       ],
-    };
+    }).exec();
 
-    if (service) {
-      query.serviceType = service;
-    }
-
-    const existingAppointments = await this.appointmentModel.find(query).exec();
-
-    const bookedSlotsSet = new Set<string>();
+    const bookingCounts: Record<string, number> = {};
     existingAppointments.forEach((app) => {
       const time = app.rescheduledTime || app.preferredTime;
-      if (time) bookedSlotsSet.add(time);
+      if (time) {
+        bookingCounts[time] = (bookingCounts[time] || 0) + 1;
+      }
     });
 
-    const allSlots = this.generateAllSlots();
-    const availableSlots = allSlots.filter((slot) => !bookedSlotsSet.has(slot));
+    const allTimeSlots = this.generateAllSlots();
+    const slots = allTimeSlots.map((time) => {
+      const booked = bookingCounts[time] || 0;
+      const available = booked < staffCapacity;
+      return {
+        time,
+        available,
+        capacity: staffCapacity,
+        booked,
+      };
+    });
+
+    const availableSlots = slots.filter((s) => s.available).map((s) => s.time);
+    const bookedSlots = slots.filter((s) => !s.available).map((s) => s.time);
 
     return {
+      date: dateStr,
+      service,
+      totalStaffAvailable: staffCapacity,
+      slots,
       availableSlots,
-      bookedSlots: Array.from(bookedSlotsSet),
+      bookedSlots,
     };
   }
 
-  async create(user: UserDocument, dto: { serviceType: ServiceType; preferredDate: string; preferredTime: string; notes?: string }) {
+  async create(user: UserDocument, dto: { serviceType: ServiceType; preferredDate: string; preferredTime: string; notes?: string; intakeResponses?: any }) {
+    // Check patient restriction
+    const patientUser = await this.userModel.findById(user._id).exec();
+    if (patientUser?.bookingRestricted) {
+      throw new ForbiddenException('Your account is restricted from creating new bookings due to multiple late cancellations or no-shows. Please contact support.');
+    }
+
     const prefDate = new Date(dto.preferredDate);
     if (isNaN(prefDate.getTime())) {
       throw new BadRequestException('Invalid preferred date');
+    }
+
+    // Auto-assign least-busy staff member
+    const dayOfWeek = prefDate.getDay();
+    const activeStaff = await this.staffService.findActiveByServiceAndDay(dto.serviceType, dayOfWeek);
+
+    let assignedStaffId: Types.ObjectId | null = null;
+    if (activeStaff.length > 0) {
+      const startOfDay = new Date(dto.preferredDate);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      const endOfDay = new Date(dto.preferredDate);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+
+      // Find staff with lowest booking count for this slot
+      let lowestCount = Infinity;
+      for (const staff of activeStaff) {
+        const count = await this.appointmentModel.countDocuments({
+          staffId: staff._id,
+          preferredDate: { $gte: startOfDay, $lte: endOfDay },
+          preferredTime: dto.preferredTime,
+          status: { $in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED] },
+        }).exec();
+
+        if (count < lowestCount) {
+          lowestCount = count;
+          assignedStaffId = staff._id as Types.ObjectId;
+        }
+      }
     }
 
     const appointment = new this.appointmentModel({
@@ -74,10 +133,12 @@ export class AppointmentsService {
       patientName: user.fullName,
       patientEmail: user.email,
       patientPhone: user.phone,
+      staffId: assignedStaffId,
       serviceType: dto.serviceType,
       preferredDate: prefDate,
       preferredTime: dto.preferredTime,
       notes: dto.notes || '',
+      intakeResponses: dto.intakeResponses || {},
       status: AppointmentStatus.PENDING,
     });
 
@@ -85,9 +146,72 @@ export class AppointmentsService {
     return appointment;
   }
 
+  async createPublic(dto: {
+    patientName: string;
+    patientEmail: string;
+    patientPhone: string;
+    serviceType: ServiceType;
+    preferredDate: string;
+    preferredTime?: string;
+    location?: string;
+    notes?: string;
+  }) {
+    const prefDate = new Date(dto.preferredDate);
+    if (isNaN(prefDate.getTime())) {
+      throw new BadRequestException('Invalid preferred date');
+    }
+
+    const time = dto.preferredTime || '09:00';
+    const dayOfWeek = prefDate.getDay();
+    const activeStaff = await this.staffService.findActiveByServiceAndDay(dto.serviceType, dayOfWeek);
+
+    let assignedStaffId: Types.ObjectId | null = null;
+    if (activeStaff.length > 0) {
+      const startOfDay = new Date(dto.preferredDate);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      const endOfDay = new Date(dto.preferredDate);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+
+      let lowestCount = Infinity;
+      for (const staff of activeStaff) {
+        const count = await this.appointmentModel.countDocuments({
+          staffId: staff._id,
+          preferredDate: { $gte: startOfDay, $lte: endOfDay },
+          preferredTime: time,
+          status: { $in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED] },
+        }).exec();
+
+        if (count < lowestCount) {
+          lowestCount = count;
+          assignedStaffId = staff._id as Types.ObjectId;
+        }
+      }
+    }
+
+    const existingUser = await this.userModel.findOne({ email: dto.patientEmail }).exec();
+
+    const appointment = new this.appointmentModel({
+      patientId: existingUser ? existingUser._id : new Types.ObjectId(),
+      patientName: dto.patientName,
+      patientEmail: dto.patientEmail,
+      patientPhone: dto.patientPhone,
+      staffId: assignedStaffId,
+      serviceType: dto.serviceType,
+      preferredDate: prefDate,
+      preferredTime: time,
+      notes: [dto.location ? `Location: ${dto.location}` : '', dto.notes || ''].filter(Boolean).join(' | '),
+      status: AppointmentStatus.PENDING,
+    });
+
+    await appointment.save();
+    return appointment;
+  }
+
+
   async getMyAppointments(userId: string) {
     return this.appointmentModel
       .find({ patientId: new Types.ObjectId(userId) })
+      .populate('staffId', 'name')
       .sort({ createdAt: -1 })
       .exec();
   }
@@ -95,12 +219,8 @@ export class AppointmentsService {
   async findAll(query: { status?: string; serviceType?: string; startDate?: string; endDate?: string; search?: string; page?: number; limit?: number }) {
     const filter: any = {};
 
-    if (query.status) {
-      filter.status = query.status;
-    }
-    if (query.serviceType) {
-      filter.serviceType = query.serviceType;
-    }
+    if (query.status) filter.status = query.status;
+    if (query.serviceType) filter.serviceType = query.serviceType;
     if (query.startDate || query.endDate) {
       filter.preferredDate = {};
       if (query.startDate) filter.preferredDate.$gte = new Date(query.startDate);
@@ -124,85 +244,139 @@ export class AppointmentsService {
     const skip = (page - 1) * limit;
 
     const [items, total] = await Promise.all([
-      this.appointmentModel.find(filter).sort({ preferredDate: -1, createdAt: -1 }).skip(skip).limit(limit).exec(),
+      this.appointmentModel
+        .find(filter)
+        .populate('staffId', 'name')
+        .sort({ preferredDate: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
       this.appointmentModel.countDocuments(filter).exec(),
     ]);
 
-    return {
-      items,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return { items, total, page, limit, totalPages: Math.ceil(total / limit) };
   }
 
   async findOne(id: string, user: UserDocument) {
-    const appointment = await this.appointmentModel.findById(id).exec();
-    if (!appointment) {
-      throw new NotFoundException('Appointment not found');
-    }
+    const appointment = await this.appointmentModel.findById(id).populate('staffId', 'name').exec();
+    if (!appointment) throw new NotFoundException('Appointment not found');
 
     if (user.role !== UserRole.ADMIN && appointment.patientId.toString() !== user._id.toString()) {
       throw new ForbiddenException('Access denied');
     }
-
     return appointment;
   }
 
   async confirm(id: string, adminNotes?: string) {
     const appointment = await this.appointmentModel.findById(id).exec();
-    if (!appointment) {
-      throw new NotFoundException('Appointment not found');
-    }
+    if (!appointment) throw new NotFoundException('Appointment not found');
 
     appointment.status = AppointmentStatus.CONFIRMED;
     if (adminNotes !== undefined) appointment.adminNotes = adminNotes;
     appointment.emailSentAt = new Date();
     await appointment.save();
+    return appointment;
+  }
 
-    await this.emailService.sendAppointmentConfirmation(appointment.patientEmail, appointment);
+  async patientReschedule(id: string, user: UserDocument, dto: { newDate: string; newTime: string }) {
+    const appointment = await this.appointmentModel.findById(id).exec();
+    if (!appointment) throw new NotFoundException('Appointment not found');
+    if (appointment.patientId.toString() !== user._id.toString()) throw new ForbiddenException('Access denied');
+
+    if (appointment.status !== AppointmentStatus.PENDING && appointment.status !== AppointmentStatus.CONFIRMED) {
+      throw new BadRequestException('Only pending or confirmed appointments can be rescheduled');
+    }
+
+    const currentApptTime = new Date(appointment.rescheduledDate || appointment.preferredDate).getTime();
+    const hoursDifference = (currentApptTime - Date.now()) / (1000 * 60 * 60);
+
+    if (hoursDifference < RESCHEDULE_CUTOFF_HOURS) {
+      throw new BadRequestException(`Rescheduling is only allowed at least ${RESCHEDULE_CUTOFF_HOURS} hours prior to appointment time.`);
+    }
+
+    // Check new slot availability
+    const avail = await this.getAvailability(dto.newDate, appointment.serviceType);
+    if (!avail.availableSlots.includes(dto.newTime)) {
+      throw new BadRequestException('Selected date/time slot is fully booked');
+    }
+
+    // Record history
+    appointment.rescheduleHistory.push({
+      fromDate: appointment.rescheduledDate || appointment.preferredDate,
+      fromTime: appointment.rescheduledTime || appointment.preferredTime,
+      toDate: new Date(dto.newDate),
+      toTime: dto.newTime,
+      changedAt: new Date(),
+    });
+
+    appointment.rescheduledDate = new Date(dto.newDate);
+    appointment.rescheduledTime = dto.newTime;
+    await appointment.save();
     return appointment;
   }
 
   async cancel(id: string, user: UserDocument, reason?: string) {
     const appointment = await this.appointmentModel.findById(id).exec();
-    if (!appointment) {
-      throw new NotFoundException('Appointment not found');
-    }
+    if (!appointment) throw new NotFoundException('Appointment not found');
 
     if (user.role !== UserRole.ADMIN && appointment.patientId.toString() !== user._id.toString()) {
       throw new ForbiddenException('Access denied');
+    }
+
+    const apptTime = new Date(appointment.rescheduledDate || appointment.preferredDate).getTime();
+    const hoursDiff = (apptTime - Date.now()) / (1000 * 60 * 60);
+
+    let isLateCancel = false;
+    if (user.role === UserRole.PATIENT && hoursDiff < LATE_CANCEL_THRESHOLD_HOURS) {
+      isLateCancel = true;
+      appointment.lateCancellation = true;
+
+      // Update patient stats
+      const patient = await this.userModel.findById(appointment.patientId).exec();
+      if (patient) {
+        patient.lateCancelCount = (patient.lateCancelCount || 0) + 1;
+        if (patient.lateCancelCount + patient.noShowCount >= 3) {
+          patient.bookingRestricted = true;
+        }
+        await patient.save();
+      }
     }
 
     appointment.status = AppointmentStatus.CANCELLED;
     if (reason) appointment.adminNotes = reason;
     await appointment.save();
 
-    await this.emailService.sendAppointmentCancellation(appointment.patientEmail, appointment, reason);
-    return appointment;
+    // Trigger waitlist auto-notification for the freed slot
+    await this.waitlistService.notifyNextInLine(
+      appointment.serviceType,
+      appointment.rescheduledDate || appointment.preferredDate,
+    );
+
+    return { appointment, isLateCancel };
   }
 
   async reschedule(id: string, dto: { rescheduledDate: string; rescheduledTime: string; adminNotes?: string }) {
     const appointment = await this.appointmentModel.findById(id).exec();
-    if (!appointment) {
-      throw new NotFoundException('Appointment not found');
-    }
+    if (!appointment) throw new NotFoundException('Appointment not found');
+
+    appointment.rescheduleHistory.push({
+      fromDate: appointment.rescheduledDate || appointment.preferredDate,
+      fromTime: appointment.rescheduledTime || appointment.preferredTime,
+      toDate: new Date(dto.rescheduledDate),
+      toTime: dto.rescheduledTime,
+      changedAt: new Date(),
+    });
 
     appointment.rescheduledDate = new Date(dto.rescheduledDate);
     appointment.rescheduledTime = dto.rescheduledTime;
     if (dto.adminNotes !== undefined) appointment.adminNotes = dto.adminNotes;
     await appointment.save();
-
-    await this.emailService.sendAppointmentReschedule(appointment.patientEmail, appointment);
     return appointment;
   }
 
   async complete(id: string) {
     const appointment = await this.appointmentModel.findById(id).exec();
-    if (!appointment) {
-      throw new NotFoundException('Appointment not found');
-    }
+    if (!appointment) throw new NotFoundException('Appointment not found');
 
     appointment.status = AppointmentStatus.COMPLETED;
     await appointment.save();
@@ -211,9 +385,7 @@ export class AppointmentsService {
 
   async remove(id: string) {
     const appointment = await this.appointmentModel.findByIdAndDelete(id).exec();
-    if (!appointment) {
-      throw new NotFoundException('Appointment not found');
-    }
+    if (!appointment) throw new NotFoundException('Appointment not found');
     return { message: 'Appointment deleted successfully' };
   }
 
@@ -223,8 +395,8 @@ export class AppointmentsService {
     const confirmedCount = await this.appointmentModel.countDocuments({ status: AppointmentStatus.CONFIRMED }).exec();
     const completedCount = await this.appointmentModel.countDocuments({ status: AppointmentStatus.COMPLETED }).exec();
     const cancelledCount = await this.appointmentModel.countDocuments({ status: AppointmentStatus.CANCELLED }).exec();
+    const lateCancelCount = await this.appointmentModel.countDocuments({ lateCancellation: true }).exec();
 
-    // Group by service type
     const byServiceRaw = await this.appointmentModel.aggregate([
       { $group: { _id: '$serviceType', count: { $sum: 1 } } }
     ]).exec();
@@ -247,7 +419,26 @@ export class AppointmentsService {
       confirmed: confirmedCount,
       completed: completedCount,
       cancelled: cancelledCount,
+      lateCancellations: lateCancelCount,
       byService,
     };
+  }
+
+  // Heatmap: 7 Days (Sun-Sat) x 24 Hours grid matrix
+  async getHeatmapData() {
+    const appointments = await this.appointmentModel.find({ status: { $ne: AppointmentStatus.CANCELLED } }).exec();
+    const matrix: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0));
+
+    appointments.forEach((app) => {
+      const date = new Date(app.rescheduledDate || app.preferredDate);
+      const day = date.getDay(); // 0..6
+      const timeStr = app.rescheduledTime || app.preferredTime || '09:00';
+      const hour = parseInt(timeStr.split(':')[0], 10) || 9;
+      if (day >= 0 && day < 7 && hour >= 0 && hour < 24) {
+        matrix[day][hour] += 1;
+      }
+    });
+
+    return matrix;
   }
 }

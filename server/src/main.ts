@@ -18,7 +18,22 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'https://www.firstcmedical.com'],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
+        'http://localhost:3000',
+        'https://www.firstcmedical.com',
+        'https://firstcmedical.com',
+      ];
+      if (allowedOrigins.includes(origin) || /^http:\/\/localhost:\d+$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true,
   });
 

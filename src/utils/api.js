@@ -1,11 +1,26 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const rawBase = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export const getApiUrl = (endpoint) => {
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  if (API_BASE_URL.endsWith('/api') && cleanEndpoint.startsWith('/api')) {
-    return `${API_BASE_URL.replace(/\/api$/, '')}${cleanEndpoint}`;
+
+  // Normalize base host by stripping trailing /api if present
+  let base = rawBase;
+  if (base.endsWith('/api')) {
+    base = base.slice(0, -4);
+  } else if (base.endsWith('/api/')) {
+    base = base.slice(0, -5);
   }
-  return `${API_BASE_URL}${cleanEndpoint}`;
+
+  // Ensure path starts with /api
+  const apiPath = (cleanEndpoint.startsWith('/api/') || cleanEndpoint === '/api')
+    ? cleanEndpoint
+    : `/api${cleanEndpoint}`;
+
+  if (!base || base === '/') {
+    return apiPath;
+  }
+
+  return `${base.replace(/\/+$/, '')}${apiPath}`;
 };
 
 export const apiFetch = async (endpoint, options = {}, tokenOverride = null) => {

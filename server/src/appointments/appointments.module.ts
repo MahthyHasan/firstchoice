@@ -6,6 +6,7 @@ import { AppointmentsService } from './appointments.service';
 import { AppointmentsController } from './appointments.controller';
 import { StaffModule } from '../staff/staff.module';
 import { WaitlistModule } from '../waitlist/waitlist.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { WaitlistModule } from '../waitlist/waitlist.module';
     ]),
     StaffModule,
     WaitlistModule,
+    NotificationsModule,
   ],
   providers: [AppointmentsService],
   controllers: [AppointmentsController],

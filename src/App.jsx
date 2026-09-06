@@ -58,6 +58,8 @@ function AppContent() {
   // Hide header & footer on auth pages and dashboard screens
   const isDashboardOrAuth =
     location.pathname.startsWith('/dashboard') ||
+    location.pathname.startsWith('/patient-dashboard') ||
+    location.pathname.startsWith('/admin-dashboard') ||
     location.pathname === '/login' ||
     location.pathname === '/register' ||
     location.pathname === '/verify-email' ||
@@ -119,7 +121,23 @@ function AppContent() {
           }
         />
         <Route
+          path="/patient-dashboard/*"
+          element={
+            <ProtectedRoute role="patient">
+              <PatientDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/dashboard/admin/*"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/*"
           element={
             <ProtectedRoute role="admin">
               <AdminDashboard />

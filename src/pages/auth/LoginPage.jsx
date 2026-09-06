@@ -42,9 +42,9 @@ const LoginPage = () => {
       setLoading(true);
       const user = await login(email, password);
       if (user.role === 'admin') {
-        navigate('/admin-dashboard');
+        navigate('/dashboard/admin');
       } else {
-        navigate('/patient-dashboard');
+        navigate('/dashboard/patient');
       }
     } catch (err) {
       const msg = err.message || 'Login failed';

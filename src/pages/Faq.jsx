@@ -18,7 +18,7 @@ const Faq = () => {
     },
     {
       q: "How do I book an appointment?",
-      a: "Call us at +974 4140 2630 or +974 5000 2334, email agentfcn@gmail.com, or use the online booking form on this website."
+      a: "Call us at +974 4140 2630 or +974 5000 2334, emailcontact@firstcmedical.com, or use the online booking form on this website."
     },
     {
       q: "What services do you offer?",

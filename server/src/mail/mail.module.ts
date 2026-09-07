@@ -24,7 +24,10 @@ import * as path from 'path';
         },
         template: {
           dir: path.join(__dirname, 'templates'),
-          adapter: new HandlebarsAdapter(),
+          adapter: new HandlebarsAdapter({
+            eq: (a: any, b: any) => a === b,
+            or: (...args: any[]) => args.slice(0, -1).some(Boolean),
+          }),
           options: { strict: true },
         },
       }),

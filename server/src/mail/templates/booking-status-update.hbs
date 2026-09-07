@@ -28,10 +28,7 @@
               <!-- Status Badge -->
               <div style="margin-bottom: 24px;">
                 <span style="display: inline-block; padding: 6px 16px; font-size: 14px; font-weight: bold; border-radius: 16px; color: #ffffff; text-transform: uppercase;
-                  {{#if (eq status 'confirmed')}}background-color: #1D9E75;{{/if}}
-                  {{#if (eq status 'rescheduled')}}background-color: #EF9F27;{{/if}}
-                  {{#if (eq status 'cancelled')}}background-color: #E24B4A;{{/if}}
-                  {{#unless (or (eq status 'confirmed') (eq status 'rescheduled') (eq status 'cancelled'))}}background-color: #0054D3;{{/unless}}">
+                  {{#if isConfirmed}}background-color: #1D9E75;{{else}}{{#if isRescheduled}}background-color: #EF9F27;{{else}}{{#if isCancelled}}background-color: #E24B4A;{{else}}background-color: #0054D3;{{/if}}{{/if}}{{/if}}">
                   Status: {{status}}
                 </span>
               </div>

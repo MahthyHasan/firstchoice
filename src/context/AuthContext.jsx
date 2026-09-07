@@ -17,7 +17,8 @@ export const AuthProvider = ({ children }) => {
 
   // Helper fetch wrapper with Bearer token
   const fetchWithAuth = async (endpoint, options = {}) => {
-    return apiFetch(endpoint, options, accessToken);
+    const activeToken = accessToken || localStorage.getItem('accessToken');
+    return apiFetch(endpoint, options, activeToken);
   };
 
   // Rehydrate session on mount via refresh token cookie
@@ -25,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       try {
         const refreshUrl = getApiUrl('/auth/refresh');
-        const refreshRes = await fetch(refreshUrl, { method: 'POST' });
+        const refreshRes = await fetch(refreshUrl, { method: 'POST', credentials: 'include' });
         const refreshData = await refreshRes.json();
 
         if (refreshData.success && refreshData.data?.accessToken) {
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch(getApiUrl('/auth/logout'), { method: 'POST' });
+      await fetch(getApiUrl('/auth/logout'), { method: 'POST', credentials: 'include' });
     } catch (e) {
       console.warn('Logout request failed:', e);
     }

@@ -38,6 +38,7 @@ export const apiFetch = async (endpoint, options = {}, tokenOverride = null) => 
   }
 
   const config = {
+    credentials: 'include',
     ...options,
     headers,
   };

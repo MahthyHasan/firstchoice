@@ -73,6 +73,9 @@ export class EmailService {
         context: {
           patientName: appointment.patientName,
           status: appointment.status,
+          isConfirmed: appointment.status === 'confirmed',
+          isRescheduled: appointment.status === 'rescheduled',
+          isCancelled: appointment.status === 'cancelled',
           serviceType: appointment.serviceType,
           preferredDate: appointment.rescheduledDate
             ? new Date(appointment.rescheduledDate).toLocaleDateString()

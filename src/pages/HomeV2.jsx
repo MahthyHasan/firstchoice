@@ -555,7 +555,7 @@ const HomeV2 = () => {
                     </h3>
                     <div id="faqCollapse4" className="accordion-collapse collapse" data-bs-parent="#firstChoiceFaq">
                       <div className="accordion-body">
-                        A: Call us at +974 4140 2630, email agentfcn@gmail.com, or use the booking form on this website.
+                        A: Call us at +974 4140 2630, emailcontact@firstcmedical.com, or use the booking form on this website.
                       </div>
                     </div>
                   </div>

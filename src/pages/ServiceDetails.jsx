@@ -104,7 +104,7 @@ const ServiceDetails = () => {
                     <p className="cs_fs_14 text-white-50 mb-3">Reach out to our Doha care coordinators for immediate scheduling:</p>
                     <p className="mb-2"><i className="fa-solid fa-phone text-success me-2"></i><a href="tel:+97441402630" className="text-white fw-bold">+974 4140 2630</a></p>
                     <p className="mb-2"><i className="fa-solid fa-mobile-screen text-success me-2"></i><a href="tel:+97450002334" className="text-white fw-bold">+974 5000 2334</a></p>
-                    <p className="mb-3"><i className="fa-solid fa-envelope text-success me-2"></i><a href="mailto:agentfcn@gmail.com" className="text-white">agentfcn@gmail.com</a></p>
+                    <p className="mb-3"><i className="fa-solid fa-envelope text-success me-2"></i><a href="mailto:contact@firstcmedical.com" className="text-white">contact@firstcmedical.com</a></p>
                     <Link to="/appointment" className="cs_btn_style_1 cs_accent_bg cs_white_color cs_radius_5 w-100 justify-content-center">
                       <span>Book Appointment</span>
                     </Link>

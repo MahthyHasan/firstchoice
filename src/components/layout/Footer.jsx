@@ -89,7 +89,7 @@ const Footer = () => {
                     <li>
                       <img src="/assets/img/icons/emain.svg" alt="Email" className="cs_contact_icon" />
                       <div>
-                        <a href="mailto:agentfcn@gmail.com" aria-label="Send email" className="cs_fs_18 cs_bold cs_white_color cs_mb_6 d-block">agentfcn@gmail.com</a>
+                        <a href="mailto:contact@firstcmedical.com" aria-label="Send email" className="cs_fs_18 cs_bold cs_white_color cs_mb_6 d-block">contact@firstcmedical.com</a>
                         <a href="https://www.ngtgroup-qa.com" target="_blank" rel="noopener noreferrer" className="cs_accent_color">www.ngtgroup-qa.com</a>
                       </div>
                     </li>
@@ -124,10 +124,10 @@ const Footer = () => {
           </div>
         </div>
       </footer>
-      <button 
-        type="button" 
-        name="ScrollToTopBtn" 
-        className={`cs_scrollup_btn ${showScrollTop ? 'show' : ''}`} 
+      <button
+        type="button"
+        name="ScrollToTopBtn"
+        className={`cs_scrollup_btn ${showScrollTop ? 'show' : ''}`}
         id="scrollToTopBtn"
         onClick={scrollToTop}
         aria-label="Scroll to top"

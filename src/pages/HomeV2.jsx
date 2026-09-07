@@ -600,7 +600,7 @@ const HomeV2 = () => {
                 <div className="p-4 cs_gray2_bg cs_radius_15 text-center h-100 shadow-sm">
                   <div className="cs_fs_30 text-success mb-3"><i className="fa-solid fa-envelope"></i></div>
                   <h3 className="cs_fs_20 cs_semibold mb-2">Email</h3>
-                  <p className="mb-0"><a href="mailto:agentfcn@gmail.com" className="text-dark fw-bold">agentfcn@gmail.com</a></p>
+                  <p className="mb-0"><a href="mailto:contact@firstcmedical.com" className="text-dark fw-bold">contact@firstcmedical.com</a></p>
                 </div>
               </div>
 

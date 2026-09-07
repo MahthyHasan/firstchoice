@@ -29,7 +29,7 @@ const Location = () => {
                     </li>
                     <li>
                       <img src="/assets/img/icons/emain.svg" alt="Email icon" className="cs_location_contact_icon" />
-                      <a href="mailto:agentfcn@gmail.com" aria-label="Send mail" className="cs_fs_20 cs_bold cs_primary_color">agentfcn@gmail.com</a>
+                      <a href="mailto:contact@firstcmedical.com" aria-label="Send mail" className="cs_fs_20 cs_bold cs_primary_color">contact@firstcmedical.com</a>
                       <p className="mb-0">Reply Within 2-4 Hours</p>
                     </li>
                   </ul>

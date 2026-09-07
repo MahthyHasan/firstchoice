@@ -13,7 +13,7 @@ const Header = () => {
                   <li className="cs_contact_item cs_fs_14 cs_white_color">
                     <img src="/assets/img/icons/emain.svg" className="cs_contact_icon" alt="Email icon" />
                     <span className="cs_contact_text">
-                      Email: <a href="mailto:agentfcn@gmail.com" aria-label="Send email tocontact@firstcmedical.com">agentfcn@gmail.com</a>
+                      Email: <a href="mailto:contact@firstcmedical.com" aria-label="Send email tocontact@firstcmedical.com">contact@firstcmedical.com</a>
                     </span>
                   </li>
                   <li className="cs_contact_item cs_fs_14 cs_white_color">

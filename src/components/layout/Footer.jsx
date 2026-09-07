@@ -90,7 +90,7 @@ const Footer = () => {
                       <img src="/assets/img/icons/emain.svg" alt="Email" className="cs_contact_icon" />
                       <div>
                         <a href="mailto:contact@firstcmedical.com" aria-label="Send email" className="cs_fs_18 cs_bold cs_white_color cs_mb_6 d-block">contact@firstcmedical.com</a>
-                        <a href="https://www.ngtgroup-qa.com" target="_blank" rel="noopener noreferrer" className="cs_accent_color">www.ngtgroup-qa.com</a>
+                        <a href="https://www.firstcmedical.com" target="_blank" rel="noopener noreferrer" className="cs_accent_color">www.firstcmedical.com</a>
                       </div>
                     </li>
                   </ul>

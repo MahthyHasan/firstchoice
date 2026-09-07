@@ -608,7 +608,7 @@ const HomeV2 = () => {
                 <div className="p-4 cs_gray2_bg cs_radius_15 text-center h-100 shadow-sm">
                   <div className="cs_fs_30 text-success mb-3"><i className="fa-solid fa-globe"></i></div>
                   <h3 className="cs_fs_20 cs_semibold mb-2">Website</h3>
-                  <p className="mb-0"><a href="https://www.ngtgroup-qa.com" target="_blank" rel="noopener noreferrer" className="text-dark fw-bold">www.ngtgroup-qa.com</a></p>
+                  <p className="mb-0"><a href="https://www.firstcmedical.com" target="_blank" rel="noopener noreferrer" className="text-dark fw-bold">www.firstcmedical.com</a></p>
                 </div>
               </div>
 

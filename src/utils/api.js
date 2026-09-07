@@ -71,6 +71,16 @@ export const apiFetch = async (endpoint, options = {}, tokenOverride = null) => 
       throw err;
     }
 
+    // Attach non-enumerable .json() helper for backward compatibility with callers expecting Response.json()
+    if (data && typeof data === 'object') {
+      Object.defineProperty(data, 'json', {
+        value: async () => data,
+        writable: true,
+        configurable: true,
+        enumerable: false,
+      });
+    }
+
     return data;
   } catch (err) {
     throw err;
